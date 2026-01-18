@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幼儿园快乐学 - 小小探险家</title>
+    <style>
+        :root {
+            --primary-color: #FF9A9E;
+            --secondary-color: #FECFEF;
+            --accent-color: #4facfe;
+            --text-color: #444;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 15px;
+            border: 2px solid var(--accent-color);
+            font-size: 16px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+            padding-bottom: 50px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            border: 4px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            border-color: var(--accent-color);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 180px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            object-fit: cover;
+        }
+
+        /* 如果你有真实的图片，img标签会覆盖上面的emoji */
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 15px;
+        }
+
+        .hanzi {
+            font-size: 32px;
+            color: #333;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .pinyin {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+            font-family: Arial, sans-serif;
+        }
+
+        .icon-sound {
+            background-color: var(--accent-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 5px;
+            font-size: 20px;
+        }
+
+        /* 简单的动画效果 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .playing .icon-sound {
+            animation: pulse 1s infinite;
+            background-color: #ff6b6b;
+        }
+
+        footer {
+            margin-top: auto;
+            color: #666;
+            font-size: 0.9em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🏫 幼儿园快乐学</h1>
+    
+    <div class="controls">
+        <label>选择课程：</label>
+        <select id="unit-selector" onchange="renderCards()">
+            <option value="unit1">单元一：开学探险日 (认识校园)</option>
+            <option value="unit2">单元二：一起玩耍 (社交礼仪)</option>
+            <option value="unit3">识字小课堂 (室与玩)</option>
+        </select>
+    </div>
+
+    <div class="grid-container" id="game-board">
+        </div>
+
+    <footer>
+        <p>点击卡片听声音，跟着大声读出来哦！</p>
+    </footer>
+
+    <script>
+        // --- 1. 数据准备 (基于你的 PDF 内容) ---
+        const gameData = {
+            unit1: [
+                { text: "老师", pinyin: "lǎo shī", emoji: "👩‍🏫", image: "" },
+                { text: "同学", pinyin: "tóng xué", emoji: "🎒", image: "" },
+                { text: "幼儿园", pinyin: "yòu ér yuán", emoji: "🏫", image: "" },
+                { text: "课室", pinyin: "kè shì", emoji: "🖍️", image: "" },
+                { text: "电脑室", pinyin: "diàn nǎo shì", emoji: "💻", image: "" },
+                { text: "办公室", pinyin: "bàn gōng shì", emoji: "🖨️", image: "" },
+                { text: "游乐场", pinyin: "yóu lè chǎng", emoji: "🎡", image: "" },
+                { text: "厕所", pinyin: "cè suǒ", emoji: "🚽", image: "" },
+                { text: "礼堂", pinyin: "lǐ táng", emoji: "🎤", image: "" },
+                { text: "校车司机", pinyin: "xiào chē sī jī", emoji: "🚌", image: "" },
+                { text: "园工", pinyin: "yuán gōng", emoji: "👨‍🌾", image: "" }
+            ],
+            unit2: [
+                { text: "朋友", pinyin: "péng yǒu", emoji: "👫", image: "" },
+                { text: "打招呼", pinyin: "dǎ zhāo hu", emoji: "👋", image: "" },
+                { text: "排队", pinyin: "pái duì", emoji: "🚶‍♂️🚶‍♀️", image: "" },
+                { text: "牵手", pinyin: "qiān shǒu", emoji: "🤝", image: "" },
+                { text: "拥抱", pinyin: "yōng bào", emoji: "🫂", image: "" },
+                { text: "分享", pinyin: "fēn xiǎng", emoji: "🍰", image: "" }
+            ],
+            unit3: [
+                { text: "室", pinyin: "shì (课室)", emoji: "🏠", image: "" },
+                { text: "玩", pinyin: "wán (玩具)", emoji: "🪁", image: "" },
+                { text: "宝盖儿", pinyin: "bǎo gài er (宀)", emoji: "roof", image: "" },
+                { text: "王字旁", pinyin: "wáng zì páng (王)", emoji: "👑", image: "" }
+            ]
+        };
+
+        // --- 2. 语音合成功能 (Text-to-Speech) ---
+        function speak(text, cardElement) {
+            // 停止当前正在播放的声音
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN'; // 设置为中文
+            utterance.rate = 0.8; // 语速稍慢，适合小朋友
+            utterance.pitch = 1.1; // 语调稍高，更有亲和力
+
+            // 动画效果
+            cardElement.classList.add('playing');
+            
+            utterance.onend = function() {
+                cardElement.classList.remove('playing');
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- 3. 渲染页面 ---
+        function renderCards() {
+            const unit = document.getElementById('unit-selector').value;
+            const container = document.getElementById('game-board');
+            container.innerHTML = ''; // 清空当前内容
+
+            const items = gameData[unit];
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                // 如果你有图片文件，可以在 data 中填入路径，这里优先显示 Emoji
+                const visualContent = item.image ? 
+                    `<img src="${item.image}" alt="${item.text}">` : 
+                    `${item.emoji}`;
+
+                card.innerHTML = `
+                    <div class="card-image">${visualContent}</div>
+                    <div class="card-content">
+                        <div class="hanzi">${item.text}</div>
+                        <div class="pinyin">${item.pinyin}</div>
+                        <div class="icon-sound">🔊</div>
+                    </div>
+                `;
+
+                // 点击事件
+                card.onclick = () => speak(item.text, card);
+
+                container.appendChild(card);
+            });
+        }
+
+        // 初始化
+        window.onload = renderCards;
+
+    </script>
+</body>
+</html>
