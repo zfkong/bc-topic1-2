@@ -3,345 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>梓辰的华语探险乐园</title>
+    <title>梓辰的华语探险</title>
     <style>
         :root {
             --primary: #FF9A9E;
             --secondary: #a1c4fd;
-            --bg: #f8f9fa;
-            --office-bg: #5dade2;
+            --bg: #fdfcfb;
+            --text: #444;
         }
 
         body {
             font-family: 'PingFang SC', sans-serif;
             background: var(--bg); margin: 0; padding: 0;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            overflow: hidden;
         }
 
         #app {
-            width: 100%; max-width: 500px; height: 95vh;
-            background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column; position: relative;
+            width: 100%; max-width: 500px; height: 96vh;
+            background: white; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; overflow: hidden; position: relative;
         }
 
         /* 顶部导航 */
-        .nav-bar {
-            padding: 10px; display: flex; justify-content: space-between;
-            background: #fff; border-bottom: 2px solid #eee; border-radius: 25px 25px 0 0;
+        .top-nav {
+            padding: 12px; display: flex; justify-content: space-between; align-items: center;
+            background: #fff; border-bottom: 2px solid #f0f0f0;
         }
-        .nav-btn {
-            border: none; background: #eee; padding: 5px 12px; border-radius: 15px;
-            font-size: 0.9em; cursor: pointer;
-        }
+        .nav-btn { border: none; background: #f0f0f0; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9em; }
 
         .screen { display: none; padding: 20px; flex-direction: column; align-items: center; flex: 1; overflow-y: auto; text-align: center; }
         .active { display: flex; }
 
-        /* 特殊图标 */
-        .icon-office {
-            background: var(--office-bg); color: white; width: 80px; height: 50px;
-            display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 14px; border-radius: 5px; border: 3px solid #2e86c1;
-            margin: 0 auto;
+        /* 老师头像 (使用本地图片) */
+        .teacher-img {
+            width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary);
+            object-fit: cover; margin-bottom: 10px; background: #eee;
         }
 
-        /* 卡片设计 */
-        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 10px; }
-        .card {
-            background: white; border: 2px solid #f0f0f0; border-radius: 15px; padding: 10px; cursor: pointer;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+        .bubble {
+            background: #fff; border: 3px solid var(--primary); padding: 15px;
+            border-radius: 20px; margin-bottom: 20px; font-weight: bold; font-size: 1.1em;
         }
-        .card-full { grid-column: span 2; text-align: left; background: #fffcf0; }
 
-        /* 游戏区域 */
-        .game-zone { width: 100%; background: #fdfdfd; border: 2px dashed var(--secondary); border-radius: 20px; padding: 15px; margin-top: 10px; }
-        .drop-area { min-height: 60px; border-bottom: 2px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 15px; padding: 10px; }
-        .word-tile { padding: 8px 15px; background: white; border: 2px solid var(--primary); border-radius: 10px; cursor: pointer; font-weight: bold; }
+        /* 卡片 */
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+        .card { background: white; border: 2px solid #eee; border-radius: 15px; padding: 12px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+        .card-full { grid-column: span 2; text-align: left; background: #fff9f9; border-left: 5px solid var(--primary); }
+        
+        /* 办公室特殊图标 */
+        .office-tag { background: #5dade2; color: white; padding: 10px; border-radius: 5px; font-weight: bold; font-size: 14px; border: 2px solid #2e86c1; margin-bottom: 5px; }
 
-        /* 画板 */
-        .canvas-container { position: relative; background: #333; border: 5px solid #8d6e63; border-radius: 10px; width: 260px; height: 260px; touch-action: none; }
-        .guide-txt { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 180px; color: rgba(255,255,255,0.1); pointer-events: none; }
+        /* 游戏 */
+        .game-panel { width: 100%; background: #fafafa; border: 2px dashed #ddd; border-radius: 20px; padding: 15px; margin-top: 10px; }
+        .drop-zone { min-height: 70px; border-bottom: 2px solid #eee; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 15px; padding: 10px; }
+        .word-tile { padding: 10px 18px; background: white; border: 2px solid var(--primary); border-radius: 12px; cursor: pointer; font-weight: bold; }
+
+        /* 写字 */
+        .board { background: #333; width: 280px; height: 280px; border: 8px solid #8d6e63; border-radius: 10px; position: relative; touch-action: none; margin: 10px 0; }
+        .guide-txt { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 160px; color: rgba(255,255,255,0.1); pointer-events: none; }
         canvas { position: absolute; top: 0; left: 0; }
 
-        .btn-main {
-            background: var(--primary); color: white; border: none; padding: 12px 30px;
-            border-radius: 50px; font-size: 1.1em; cursor: pointer; margin-top: 20px;
-        }
-        
-        h2 { color: var(--primary); margin: 10px 0; }
-        .teacher-avatar { font-size: 70px; animation: wave 2s infinite; }
-        @keyframes wave { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(10deg); } }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.2em; cursor: pointer; margin-top: 20px; box-shadow: 0 5px 15px rgba(255,154,158,0.3); }
+        .btn-main:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <div class="nav-bar" id="top-nav" style="display:none">
+    <div class="top-nav" id="top-nav" style="display:none">
         <button class="nav-btn" onclick="goHome()">🏠 主页</button>
-        <div id="page-indicator" style="font-weight:bold; color:#888;">第 1 页</div>
-        <button class="nav-btn" onclick="finishApp()">🔴 结束</button>
+        <span id="page-info" style="font-weight:bold; color:var(--primary)">P1</span>
+        <button class="nav-btn" onclick="finishApp()">结束</button>
     </div>
 
     <div id="scr-start" class="screen active" style="justify-content: center;">
-        <div class="teacher-avatar">👩‍🏫</div>
-        <h2 style="font-size: 1.5em;">梓辰的华语探险</h2>
+        <img src="teacher.png" class="teacher-img" alt="老师">
+        <h2>梓辰的华语探险</h2>
         <button class="btn-main" onclick="startApp()">点击开始 🎈</button>
     </div>
 
     <div id="scr-learn" class="screen">
-        <h2>📚 听一听，读一读</h2>
+        <h3 id="learn-title">📚 点一点，大声读</h3>
         <div class="card-grid" id="learn-items"></div>
-        <button class="btn-main" onclick="nextActivity()">去玩游戏 🎮</button>
+        <button class="btn-main" onclick="nextStep()">去拼句子 🧩</button>
     </div>
 
     <div id="scr-quiz-sentence" class="screen">
-        <h2>🧩 句子排排队</h2>
-        <div class="game-zone">
-            <div class="drop-area" id="sentence-target"></div>
-            <div id="sentence-pool" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
+        <h3>🧩 句子排排队</h3>
+        <p>把词语排成正确的句子：</p>
+        <div class="game-panel">
+            <div class="drop-zone" id="target-zone"></div>
+            <div id="pool-zone" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
         </div>
         <button class="btn-main" onclick="checkSentence()">检查答案 ✅</button>
     </div>
 
     <div id="scr-quiz-write" class="screen">
-        <h2>✍️ 小小书法家</h2>
-        <p id="write-hint"></p>
-        <div class="canvas-container">
+        <h3>✍️ 小小书法家</h3>
+        <p id="write-title"></p>
+        <div class="board">
             <div class="guide-txt" id="canvas-guide"></div>
-            <canvas id="write-canvas" width="260" height="260"></canvas>
+            <canvas id="canvas" width="280" height="280"></canvas>
         </div>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button onclick="clearCanvas()">擦掉</button>
-            <button class="btn-main" style="margin:0" onclick="nextActivity()">写好了</button>
+        <div style="display:flex; gap:10px; width:100%; justify-content:center;">
+            <button onclick="clearCanvas()" style="padding:10px 20px;">擦掉</button>
+            <button class="btn-main" style="margin:0" id="btn-next-write" onclick="confirmWrite()">写好了</button>
         </div>
     </div>
 
-    <div id="scr-end" class="screen" style="justify-content: center;">
-        <div class="teacher-avatar">👋</div>
-        <h2 id="end-msg"></h2>
-        <button class="btn-main" onclick="goHome()">再玩一次</button>
+    <div id="scr-page-done" class="screen" style="justify-content: center;">
+        <div style="font-size:80px">🌟</div>
+        <h2>太棒了！</h2>
+        <p id="done-msg"></p>
+        <button class="btn-main" id="btn-next-page" onclick="goToNextPage()">进入下一关 🚀</button>
+    </div>
+
+    <div id="scr-final" class="screen" style="justify-content: center;">
+        <img src="teacher.png" class="teacher-img">
+        <h2 id="final-msg"></h2>
+        <button class="btn-main" onclick="goHome()">回到主页</button>
     </div>
 </div>
 
 <script>
-    // --- 数据：严格按页分类 ---
-    const pages = [
+    // --- 严格按照 PDF 和你的要求配置数据 ---
+    const pageData = [
         {
-            title: "第 1 页",
-            words: [
-                { zh: '老师', icon: '👩‍🏫' },
-                { zh: '同学', icon: '👦' },
-                { zh: '幼儿园', icon: '🏫' }
-            ],
-            sentences: [
-                "幼儿园",
-                "我的幼儿园",
-                "这是我的幼儿园。"
-            ],
-            quiz: "这是我的幼儿园",
-            write: ["老", "师"]
+            p: "P1",
+            words: [{z:'老师', i:'👩‍🏫'}, {z:'同学', i:'👦'}, {z:'幼儿园', i:'🏫'}],
+            sentences: ["幼儿园", "我的幼儿园", "这是我的幼儿园。"],
+            quiz: { full: "这是我的幼儿园", parts: ["这是", "我的", "幼儿园"] },
+            write: ["老师", "同学", "幼儿园"]
         },
         {
-            title: "第 2 页",
-            words: [
-                { zh: '课室', icon: '🏠' }, // 房间图案
-                { zh: '电脑室', icon: '💻' },
-                { zh: '办公室', isOffice: true }, // OFFICE字样
-                { zh: '学习角落', icon: '📚' } // 书橱
-            ],
-            sentences: [
-                "幼儿园里有电脑室和办公室。",
-                "课室里有学习角落。"
-            ],
-            quiz: "幼儿园里有电脑室和办公室",
-            write: ["学"]
+            p: "P2",
+            words: [{z:'课室', i:'🏠'}, {z:'电脑室', i:'💻'}, {z:'办公室', off:true}, {z:'学习角落', i:'📚'}],
+            sentences: ["幼儿园里有课室。", "课室里有学习角落。", "幼儿园里有电脑室和办公室。"],
+            quiz: { full: "幼儿园里有电脑室和办公室", parts: ["幼儿园里", "有", "电脑室", "和", "办公室"] },
+            write: ["课室", "办公室"]
         },
         {
-            title: "第 3 页",
-            words: [
-                { zh: '游乐场', icon: '🌳' }, // 公园图案
-                { zh: '厕所', icon: '🚻' },
-                { zh: '礼堂', icon: '🎭' } // 舞台
-            ],
-            sentences: [
-                "游乐场旁边有厕所。",
-                "幼儿园里有礼堂。",
-                "礼堂里有园长，老师和同学。"
-            ],
-            quiz: "幼儿园里有礼堂",
-            write: ["园"]
+            p: "P3",
+            words: [{z:'游乐场', i:'🌳'}, {z:'厕所', i:'🚻'}, {z:'礼堂', i:'🎭'}],
+            sentences: ["游乐场旁边有厕所。", "幼儿园里有礼堂。", "礼堂里有园长，老师和同学。"],
+            quiz: { full: "幼儿园里有礼堂", parts: ["幼儿园里", "有", "礼堂"] },
+            write: ["游乐场", "礼堂"]
         },
         {
-            title: "第 4 页",
-            words: [
-                { zh: '园长', icon: '👨‍💼' },
-                { zh: '同学', icon: '👧' }
-            ],
-            sentences: [
-                "办公室里有园长和老师。",
-                "课室里有同学。"
-            ],
-            quiz: "课室里有同学",
-            write: ["校"]
+            p: "P4",
+            words: [{z:'园长', i:'👨‍💼'}, {z:'老师', i:'👩‍🏫'}, {z:'同学', i:'👧'}],
+            sentences: ["办公室里有园长和老师。", "课室里有同学。"],
+            quiz: { full: "课室里有同学", parts: ["课室里", "有", "同学"] },
+            write: ["园长", "同学"]
         },
         {
-            title: "第 5 页",
-            words: [
-                { zh: '校车司机', icon: '🚌' },
-                { zh: '校工', icon: '👨‍🌾' }
-            ],
-            sentences: [
-                "幼儿园里有校车。",
-                "校车司机接送我们上下学。",
-                "幼儿园里有校工。"
-            ],
-            quiz: "幼儿园里有校车",
-            write: ["车"]
+            p: "P5",
+            words: [{z:'校车司机', i:'🚌'}, {z:'园工', i:'👨‍🌾'}],
+            sentences: ["幼儿园里有校车。", "校车司机接送我们上下学。", "幼儿园里有园工。"],
+            quiz: { full: "幼儿园里有校车", parts: ["幼儿园里", "有", "校车"] },
+            write: ["校车", "园工"]
         }
     ];
 
-    let currentPage = 0;
-    let currentActivity = 0; // 0: Learn, 1: Sentence, 2: Write
+    let currentIdx = 0;
+    let step = 0; // 0: Learn, 1: Quiz, 2: Write
+    let writeSubIdx = 0;
 
-    // --- 核心功能 ---
-    function say(txt, rate = 0.7, cb) {
-        window.speechSynthesis.cancel();
-        const m = new SpeechSynthesisUtterance(txt);
+    const speech = window.speechSynthesis;
+    function say(t, rate=0.7, cb) {
+        speech.cancel();
+        const m = new SpeechSynthesisUtterance(t);
         m.lang = 'zh-CN'; m.rate = rate;
         if(cb) m.onend = cb;
-        window.speechSynthesis.speak(m);
+        speech.speak(m);
     }
 
-    function showScreen(id) {
+    function show(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        document.getElementById('top-nav').style.display = (id === 'scr-start' || id === 'scr-end') ? 'none' : 'flex';
+        document.getElementById('top-nav').style.display = (id==='scr-start'||id==='scr-final')?'none':'flex';
     }
 
-    // --- 流程控制 ---
     function startApp() {
-        currentPage = 0;
-        currentActivity = 0;
-        say("嗨，梓辰，让我们一起来学华语吧！", 0.8, () => loadActivity());
+        currentIdx = 0;
+        step = 0;
+        say("嗨，梓辰，让我们一起来学华语吧！", 0.8, () => loadStep());
     }
 
-    function loadActivity() {
-        const page = pages[currentPage];
-        document.getElementById('page-indicator').innerText = page.title;
+    function loadStep() {
+        const data = pageData[currentIdx];
+        document.getElementById('page-info').innerText = data.p;
 
-        if (currentActivity === 0) {
-            renderLearn(page);
-        } else if (currentActivity === 1) {
-            renderSentenceQuiz(page);
-        } else if (currentActivity === 2) {
-            renderWriteQuiz(page);
+        if(step === 0) { // Learn
+            show('scr-learn');
+            const items = document.getElementById('learn-items');
+            items.innerHTML = '';
+            data.words.forEach(w => {
+                const d = document.createElement('div');
+                d.className = 'card';
+                d.innerHTML = w.off ? `<div class="office-tag">OFFICE</div>` : `<div style="font-size:40px">${w.i}</div>`;
+                d.innerHTML += `<b>${w.z}</b>`;
+                d.onclick = () => say(w.z);
+                items.appendChild(d);
+            });
+            data.sentences.forEach(s => {
+                const d = document.createElement('div');
+                d.className = 'card card-full';
+                d.innerHTML = `🔊 ${s}`;
+                d.onclick = () => say(s);
+                items.appendChild(d);
+            });
+            say("点一点卡片，听听老师怎么读。");
+        } 
+        else if(step === 1) { // Sentence Quiz
+            show('scr-quiz-sentence');
+            const target = document.getElementById('target-zone');
+            const pool = document.getElementById('pool-zone');
+            target.innerHTML = ''; pool.innerHTML = '';
+            [...data.quiz.parts].sort(()=>Math.random()-0.5).forEach(p => {
+                const d = document.createElement('div');
+                d.className = 'word-tile';
+                d.innerText = p;
+                d.onclick = () => { if(d.parentElement===pool) target.appendChild(d); else pool.appendChild(d); say(p); }
+                pool.appendChild(d);
+            });
+            say("梓辰，把句子排好。");
+        }
+        else if(step === 2) { // Write Quiz
+            show('scr-quiz-write');
+            writeSubIdx = 0;
+            initCanvas();
+            loadWriteChar();
         }
     }
 
-    function nextActivity() {
-        currentActivity++;
-        if (currentActivity > 2) {
-            currentActivity = 0;
-            currentPage++;
-        }
-        
-        if (currentPage >= pages.length) {
-            finishApp();
-        } else {
-            loadActivity();
-        }
-    }
-
-    // 1. 点读
-    function renderLearn(page) {
-        showScreen('scr-learn');
-        const grid = document.getElementById('learn-items');
-        grid.innerHTML = '';
-        
-        page.words.forEach(w => {
-            const div = document.createElement('div');
-            div.className = 'card';
-            div.innerHTML = w.isOffice ? `<div class="icon-office">OFFICE</div>` : `<div style="font-size:40px">${w.icon}</div>`;
-            div.innerHTML += `<b>${w.zh}</b>`;
-            div.onclick = () => say(w.zh);
-            grid.appendChild(div);
-        });
-
-        page.sentences.forEach(s => {
-            const div = document.createElement('div');
-            div.className = 'card card-full';
-            div.innerHTML = `🔊 ${s}`;
-            div.onclick = () => say(s);
-            grid.appendChild(div);
-        });
-        say("请点一点，听听老师怎么读。");
-    }
-
-    // 2. 拼句
-    function renderSentenceQuiz(page) {
-        showScreen('scr-quiz-sentence');
-        const target = document.getElementById('sentence-target');
-        const pool = document.getElementById('sentence-pool');
-        target.innerHTML = ''; pool.innerHTML = '';
-        
-        const text = page.quiz;
-        // 简单分词逻辑
-        const parts = text.length > 5 ? [text.substring(0,3), text.substring(3,5), text.substring(5)] : [text.substring(0,2), text.substring(2)];
-        
-        parts.sort(() => 0.5 - Math.random()).forEach(p => {
-            const d = document.createElement('div');
-            d.className = 'word-tile';
-            d.innerText = p;
-            d.onclick = () => {
-                if(d.parentElement === pool) target.appendChild(d);
-                else pool.appendChild(d);
-                say(p);
-            }
-            pool.appendChild(d);
-        });
+    function nextStep() {
+        step++;
+        loadStep();
     }
 
     function checkSentence() {
-        const userText = Array.from(document.getElementById('sentence-target').children).map(e=>e.innerText).join('');
-        if(userText === pages[currentPage].quiz) {
-            say("太棒了！拼对了。");
-            setTimeout(nextActivity, 1000);
+        const userText = Array.from(document.getElementById('target-zone').children).map(e=>e.innerText).join('');
+        if(userText === pageData[currentIdx].quiz.full) {
+            say("太棒了，梓辰拼对了！");
+            setTimeout(nextStep, 1000);
         } else {
             say("顺序不太对哦，再试一次。");
         }
     }
 
-    // 3. 写字
-    let writeSubIdx = 0;
-    function renderWriteQuiz(page) {
-        showScreen('scr-quiz-write');
-        writeSubIdx = 0;
-        initCanvas();
-        loadChar();
-    }
-
-    function loadChar() {
-        const char = pages[currentPage].write[writeSubIdx];
-        document.getElementById('canvas-guide').innerText = char;
-        document.getElementById('write-hint').innerText = `跟着写“${char}”字`;
+    function loadWriteChar() {
+        const word = pageData[currentIdx].write[writeSubIdx];
+        document.getElementById('write-title').innerText = `请写出词组：“${word}”`;
+        document.getElementById('canvas-guide').innerText = word.charAt(0); // 引导第一个字
         clearCanvas();
-        say(`请写出“${char}”这个字。`);
+        say(`请写出“${word}”。`);
     }
 
-    // --- 工具 ---
-    function goHome() { showScreen('scr-start'); }
+    function confirmWrite() {
+        const wordArr = pageData[currentIdx].write;
+        writeSubIdx++;
+        if(writeSubIdx < wordArr.length) {
+            loadWriteChar();
+        } else {
+            // 完成本页所有任务
+            show('scr-page-done');
+            document.getElementById('done-msg').innerText = `梓辰完成了 ${pageData[currentIdx].p} 的所有任务！`;
+            say("太棒了！这一关挑战成功！");
+        }
+    }
+
+    function goToNextPage() {
+        currentIdx++;
+        step = 0;
+        if(currentIdx < pageData.length) {
+            loadStep();
+        } else {
+            finishApp();
+        }
+    }
+
     function finishApp() {
-        showScreen('scr-end');
+        show('scr-final');
         const msg = "梓辰真棒！全部分页都挑战成功啦，下次见，拜拜！";
-        document.getElementById('end-msg').innerText = msg;
+        document.getElementById('final-msg').innerText = msg;
         say(msg, 0.8);
     }
+
+    function goHome() { show('scr-start'); }
 
     // 画布逻辑
     let ctx, painting = false;
     function initCanvas() {
-        const canvas = document.getElementById('write-canvas');
+        const canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
         ctx.strokeStyle = "white"; ctx.lineWidth = 10; ctx.lineCap = "round";
         const getXY = (e) => {
@@ -354,8 +308,7 @@
         canvas.onmousemove = canvas.ontouchmove = (e) => { if(painting) { const [x,y]=getXY(e); ctx.lineTo(x,y); ctx.stroke(); } };
         canvas.onmouseup = canvas.ontouchend = () => { painting = false; };
     }
-    function clearCanvas() { ctx.clearRect(0,0,260,260); }
-
+    function clearCanvas() { ctx.clearRect(0,0,280,280); }
 </script>
 </body>
 </html>
