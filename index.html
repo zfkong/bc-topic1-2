@@ -6,48 +6,46 @@
     <title>梓辰的华语探险</title>
     <style>
         :root { --primary: #FF9A9E; --secondary: #a1c4fd; --bg: #fdfcfb; }
-        body { font-family: 'PingFang SC', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-        #app { width: 100%; max-width: 500px; height: 96vh; background: white; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        body { font-family: 'PingFang SC', sans-serif; background: var(--bg); margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; touch-action: manipulation; }
         
-        /* 导航栏：包含跳过按钮 */
-        .top-nav { padding: 12px; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 2px solid #f0f0f0; }
-        .nav-btn { border: none; background: #f0f0f0; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.85em; font-weight: bold; }
-        .skip-btn { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        #app { width: 100%; max-width: 600px; height: 100vh; background: white; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        
+        /* 导航栏优化：增加后退和前进 */
+        .top-nav { padding: 10px; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 2px solid #f0f0f0; }
+        .nav-group { display: flex; gap: 5px; }
+        .nav-btn { border: none; background: #f0f0f0; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 0.8em; font-weight: bold; }
+        .jump-btn { background: #e3f2fd; color: #1976d2; }
 
-        .screen { display: none; padding: 20px; flex-direction: column; align-items: center; flex: 1; overflow-y: auto; text-align: center; }
+        .screen { display: none; padding: 15px; flex-direction: column; align-items: center; flex: 1; overflow-y: auto; text-align: center; }
         .active { display: flex; }
         
-        .teacher-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; margin-bottom: 10px; }
+        .teacher-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
         
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-        .card { background: white; border: 2px solid #eee; border-radius: 15px; padding: 12px; cursor: pointer; }
-        .card-full { grid-column: span 2; text-align: left; background: #fff9f9; border-left: 5px solid var(--primary); font-size: 1.1em; padding: 15px; }
+        .card { background: white; border: 2px solid #eee; border-radius: 15px; padding: 10px; cursor: pointer; }
+        .card-full { grid-column: span 2; text-align: left; background: #fff9f9; border-left: 5px solid var(--primary); font-size: 1.2em; padding: 15px; }
         
-        /* 办公室标签 */
-        .office-tag { background: #5dade2; color: white; padding: 8px 12px; border-radius: 5px; font-weight: bold; font-size: 14px; border: 2px solid #2e86c1; display: inline-block; margin-bottom: 5px; }
+        .office-tag { background: #5dade2; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block; margin-bottom: 5px; }
 
-        .game-panel { width: 100%; background: #fafafa; border: 2px dashed #ddd; border-radius: 20px; padding: 15px; }
-        .drop-zone { min-height: 70px; border-bottom: 2px solid #eee; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 15px; padding: 10px; }
-        .word-tile { padding: 10px 18px; background: white; border: 2px solid var(--primary); border-radius: 12px; cursor: pointer; font-weight: bold; }
-
-        /* 写字板：支持长词组显示 */
-        .board { background: #333; width: 300px; height: 300px; border: 8px solid #8d6e63; border-radius: 10px; position: relative; touch-action: none; margin: 10px 0; }
-        .guide-txt { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 80px; color: rgba(255,255,255,0.15); pointer-events: none; letter-spacing: 5px; padding: 10px; box-sizing: border-box; }
-        canvas { position: absolute; top: 0; left: 0; }
+        /* 写字板优化：放大且笔触变细 */
+        .board-container { width: 95%; margin: 10px auto; position: relative; }
+        .board { background: #333; width: 100%; aspect-ratio: 1 / 1; border: 6px solid #8d6e63; border-radius: 10px; position: relative; touch-action: none; }
+        .guide-txt { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 70px; color: rgba(255,255,255,0.18); pointer-events: none; letter-spacing: 2px; padding: 10px; box-sizing: border-box; font-weight: bold; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
-        .btn-main { background: var(--primary); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.2em; cursor: pointer; margin-top: 20px; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.2em; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
 <div id="app">
     <div class="top-nav" id="top-nav" style="display:none">
-        <button class="nav-btn" onclick="goHome()">🏠 主页</button>
-        <div>
-            <span id="page-info" style="font-weight:bold; color:var(--primary); margin-right:10px;">P1</span>
-            <button class="nav-btn skip-btn" onclick="goToNextPage()">⏭️ 跳过本页</button>
+        <button class="nav-btn" onclick="goPrevPage()">⏮️ 上一页</button>
+        <div class="nav-group">
+            <span id="page-info" style="font-weight:bold; line-height:35px; margin: 0 5px;">P1</span>
+            <button class="nav-btn jump-btn" onclick="goNextPage()">下一页 ⏭️</button>
         </div>
-        <button class="nav-btn" onclick="finishApp()">🔴 结束</button>
+        <button class="nav-btn" onclick="goHome()">🏠</button>
     </div>
 
     <div id="scr-start" class="screen active" style="justify-content: center;">
@@ -57,44 +55,45 @@
     </div>
 
     <div id="scr-learn" class="screen">
-        <h3>📚 点点听声音</h3>
+        <h3>📚 听一听</h3>
         <div class="card-grid" id="learn-items"></div>
-        <button class="btn-main" onclick="nextStep()">去拼句子 🧩</button>
+        <button class="btn-main" onclick="nextStep()">拼句子 🧩</button>
     </div>
 
     <div id="scr-quiz-sentence" class="screen">
         <h3>🧩 句子排排队</h3>
-        <div class="game-panel">
-            <div class="drop-zone" id="target-zone"></div>
-            <div id="pool-zone" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
+        <div style="background:#fafafa; border:2px dashed #ddd; border-radius:15px; padding:10px; width:100%; box-sizing:border-box;">
+            <div id="target-zone" style="min-height:60px; border-bottom:2px solid #eee; display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:15px;"></div>
+            <div id="pool-zone" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
         </div>
-        <button class="btn-main" onclick="checkSentence()">检查答案 ✅</button>
+        <button class="btn-main" onclick="checkSentence()">检查 ✅</button>
     </div>
 
     <div id="scr-quiz-write" class="screen">
         <h3>✍️ 小小书法家</h3>
-        <p id="write-title" style="font-weight:bold; font-size:1.2em; color:var(--primary)"></p>
-        <div class="board">
-            <div class="guide-txt" id="canvas-guide"></div>
-            <canvas id="canvas" width="300" height="300"></canvas>
+        <p id="write-title" style="font-weight:bold; color:var(--primary); margin:5px 0;"></p>
+        <div class="board-container">
+            <div class="board">
+                <div class="guide-txt" id="canvas-guide"></div>
+                <canvas id="canvas"></canvas>
+            </div>
         </div>
-        <div style="display:flex; gap:10px; width:100%; justify-content:center;">
-            <button onclick="clearCanvas()" style="padding:10px 20px; border-radius:10px; border:1px solid #ccc;">重写</button>
+        <div style="display:flex; gap:10px;">
+            <button onclick="clearCanvas()" style="padding:10px 25px; border-radius:30px; border:1px solid #ccc; background:white;">重写</button>
             <button class="btn-main" style="margin:0" onclick="confirmWrite()">写好了</button>
         </div>
     </div>
 
     <div id="scr-page-done" class="screen" style="justify-content: center;">
-        <div style="font-size:80px">🌟</div>
-        <h2>完成啦！</h2>
-        <p id="done-msg"></p>
-        <button class="btn-main" onclick="goToNextPage()">进入下一页 🚀</button>
+        <div style="font-size:60px">🌟</div>
+        <h2>太棒了！</h2>
+        <button class="btn-main" onclick="goNextPage()">下一页 🚀</button>
     </div>
 
     <div id="scr-final" class="screen" style="justify-content: center;">
         <img src="teacher.png" class="teacher-img">
-        <h2>梓辰真棒！全部分页都挑战成功！</h2>
-        <button class="btn-main" onclick="goHome()">回到主页</button>
+        <h2>全部挑战成功！</h2>
+        <button class="btn-main" onclick="goHome()">回主页</button>
     </div>
 </div>
 
@@ -124,10 +123,9 @@
 
     let currentIdx = 0, step = 0, writeWordIdx = 0;
     const speech = window.speechSynthesis;
-    function say(t) { speech.cancel(); const m = new SpeechSynthesisUtterance(t); m.lang = 'zh-CN'; m.rate = 0.7; speech.speak(m); }
+    function say(t) { speech.cancel(); const m = new SpeechSynthesisUtterance(t); m.lang = 'zh-CN'; m.rate = 0.8; speech.speak(m); }
     function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.getElementById('top-nav').style.display = (id==='scr-start'||id==='scr-final')?'none':'flex'; }
 
-    // 点击开始不说话，直接进入
     function startApp() { currentIdx = 0; step = 0; loadStep(); }
 
     function loadStep() {
@@ -135,23 +133,21 @@
         document.getElementById('page-info').innerText = data.p;
         if(step === 0) {
             show('scr-learn'); const items = document.getElementById('learn-items'); items.innerHTML = '';
-            data.words.forEach(w => { const d = document.createElement('div'); d.className = 'card'; d.innerHTML = w.off ? `<div class="office-tag">OFFICE</div>` : `<div style="font-size:40px">${w.i}</div>`; d.innerHTML += `<br><b>${w.z}</b>`; d.onclick = () => say(w.z); items.appendChild(d); });
+            data.words.forEach(w => { const d = document.createElement('div'); d.className = 'card'; d.innerHTML = w.off ? `<div class="office-tag">OFFICE</div>` : `<div style="font-size:35px">${w.i}</div>`; d.innerHTML += `<br><b>${w.z}</b>`; d.onclick = () => say(w.z); items.appendChild(d); });
             data.sentences.forEach(s => { const d = document.createElement('div'); d.className = 'card card-full'; d.innerHTML = `🔊 ${s}`; d.onclick = () => say(s); items.appendChild(d); });
         } else if(step === 1) {
             show('scr-quiz-sentence'); const target = document.getElementById('target-zone'); const pool = document.getElementById('pool-zone'); target.innerHTML = ''; pool.innerHTML = '';
             [...data.quiz.parts].sort(()=>Math.random()-0.5).forEach(p => { const d = document.createElement('div'); d.className = 'word-tile'; d.innerText = p; d.onclick = () => { if(d.parentElement===pool) target.appendChild(d); else pool.appendChild(d); say(p); }; pool.appendChild(d); });
         } else if(step === 2) {
-            show('scr-quiz-write'); writeWordIdx = 0; initCanvas(); loadWriteWord();
+            show('scr-quiz-write'); writeWordIdx = 0; resizeCanvas(); loadWriteWord();
         }
     }
 
-    // 写字：一次性显示整个词组作为示范
     function loadWriteWord() {
         const word = pageData[currentIdx].write[writeWordIdx];
-        document.getElementById('write-title').innerText = `请写词组：${word}`;
-        document.getElementById('canvas-guide').innerText = word; // 直接显示整个词组
-        // 根据字数自动缩小字体
-        document.getElementById('canvas-guide').style.fontSize = word.length > 2 ? '60px' : '80px';
+        document.getElementById('write-title').innerText = `正在写：${word}`;
+        document.getElementById('canvas-guide').innerText = word;
+        document.getElementById('canvas-guide').style.fontSize = word.length > 2 ? '45px' : '70px';
         clearCanvas();
         say(word);
     }
@@ -162,33 +158,58 @@
             loadWriteWord();
         } else {
             show('scr-page-done'); 
-            document.getElementById('done-msg').innerText = `梓辰完成了 ${pageData[currentIdx].p} 的全部内容！`;
-            say("太棒了");
+            say("非常棒");
         }
     }
 
     function nextStep() { step++; loadStep(); }
-    function checkSentence() { if(Array.from(document.getElementById('target-zone').children).map(e=>e.innerText).join('') === pageData[currentIdx].quiz.full) { say("正确"); setTimeout(nextStep, 800); } else say("再试一次"); }
+    function checkSentence() { if(Array.from(document.getElementById('target-zone').children).map(e=>e.innerText).join('') === pageData[currentIdx].quiz.full) { say("正确"); setTimeout(nextStep, 600); } else say("再试一次"); }
     
-    // 跳过逻辑：直接前往下一页
-    function goToNextPage() { 
-        currentIdx++; step = 0; 
-        if(currentIdx < pageData.length) loadStep(); 
+    // 导航控制
+    function goNextPage() { 
+        if(currentIdx < pageData.length - 1) { currentIdx++; step = 0; loadStep(); } 
         else show('scr-final'); 
+    }
+    function goPrevPage() { 
+        if(currentIdx > 0) { currentIdx--; step = 0; loadStep(); } 
     }
     
     function goHome() { show('scr-start'); }
-    function finishApp() { show('scr-final'); }
 
-    let ctx, painting = false;
-    function initCanvas() {
-        const canvas = document.getElementById('canvas'); ctx = canvas.getContext('2d'); ctx.strokeStyle = "white"; ctx.lineWidth = 8; ctx.lineCap = "round";
-        const getXY = (e) => { const r = canvas.getBoundingClientRect(); return [(e.clientX || e.touches[0].clientX) - r.left, (e.clientY || e.touches[0].clientY) - r.top]; }
-        canvas.onmousedown = canvas.ontouchstart = (e) => { painting = true; ctx.beginPath(); const [x,y]=getXY(e); ctx.moveTo(x,y); };
-        canvas.onmousemove = canvas.ontouchmove = (e) => { if(painting) { const [x,y]=getXY(e); ctx.lineTo(x,y); ctx.stroke(); } };
+    // 写字逻辑优化：笔触变细
+    let canvas, ctx, painting = false;
+    function resizeCanvas() {
+        canvas = document.getElementById('canvas');
+        const box = canvas.parentElement.getBoundingClientRect();
+        canvas.width = box.width;
+        canvas.height = box.height;
+        ctx = canvas.getContext('2d');
+        ctx.strokeStyle = "white"; 
+        ctx.lineWidth = 4; // 笔触调细
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        initPaint();
+    }
+
+    function initPaint() {
+        const getXY = (e) => { 
+            const r = canvas.getBoundingClientRect(); 
+            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            return [clientX - r.left, clientY - r.top]; 
+        }
+        canvas.onmousedown = canvas.ontouchstart = (e) => { 
+            painting = true; ctx.beginPath(); 
+            const [x,y]=getXY(e); ctx.moveTo(x,y); 
+            if(e.type === 'touchstart') e.preventDefault();
+        };
+        canvas.onmousemove = canvas.ontouchmove = (e) => { 
+            if(painting) { const [x,y]=getXY(e); ctx.lineTo(x,y); ctx.stroke(); } 
+            if(e.type === 'touchmove') e.preventDefault();
+        };
         canvas.onmouseup = canvas.ontouchend = () => { painting = false; };
     }
-    function clearCanvas() { ctx.clearRect(0,0,300,300); }
+    function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); }
 </script>
 </body>
 </html>
