@@ -3,168 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>梓辰的华语乐园</title>
+    <title>梓辰的华语超级乐园</title>
     <style>
         :root {
             --primary: #FF9A9E;
             --secondary: #a1c4fd;
-            --accent: #fbc2eb;
+            --bg: #fdfbfb;
             --text: #444;
-            --chalk: rgba(255, 255, 255, 0.8);
         }
 
         body {
-            font-family: 'Helvetica Neue', 'PingFang SC', sans-serif;
-            background: #f0f4f8; margin: 0; padding: 0;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg); margin: 0; padding: 0;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            touch-action: manipulation;
         }
 
         #app {
-            width: 100%; max-width: 600px; height: 95vh;
-            background: white; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            width: 100%; max-width: 600px; height: 98vh;
+            background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             display: flex; flex-direction: column; overflow: hidden; position: relative;
         }
 
         .screen { display: none; padding: 20px; flex-direction: column; align-items: center; text-align: center; height: 100%; box-sizing: border-box; }
         .active { display: flex; }
 
-        /* 老师动画 */
-        .teacher { font-size: 90px; margin-bottom: 10px; animation: wave 2s infinite; }
-        @keyframes wave { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(10deg); } }
+        /* 老师组件 */
+        .teacher-icon { font-size: 80px; margin-bottom: 10px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
         .bubble {
-            background: #fff; border: 4px solid var(--primary); padding: 15px;
-            border-radius: 20px; position: relative; margin-bottom: 20px;
-            font-size: 1.2em; color: var(--text); font-weight: bold;
+            background: #fff; border: 3px solid var(--primary); padding: 15px;
+            border-radius: 20px; margin-bottom: 20px; font-size: 1.2em; line-height: 1.4;
         }
 
         /* 学习网格 */
-        .scroll-area { width: 100%; overflow-y: auto; flex: 1; padding: 10px; }
-        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .scroll-area { width: 100%; overflow-y: auto; flex: 1; padding: 10px; box-sizing: border-box;}
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .card {
-            background: #fff; border: 2px solid #eee; border-radius: 15px;
-            padding: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            background: #fff; border: 2px solid #f0f0f0; border-radius: 12px;
+            padding: 10px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .card:hover { border-color: var(--primary); transform: scale(1.02); }
-        .card-icon { font-size: 45px; }
-        .card-zh { font-size: 1.3em; font-weight: bold; margin: 5px 0; }
-        .sentence { grid-column: span 2; background: #fff9fa; border-left: 5px solid var(--primary); text-align: left; padding: 15px; }
+        .card-icon { font-size: 40px; margin-bottom: 5px; }
+        .card-zh { font-size: 1.1em; font-weight: bold; color: #333; }
+        .card-py { font-size: 0.8em; color: #999; }
+        .full-width { grid-column: span 2; background: #fff9f9; text-align: left; border-left: 4px solid var(--primary); }
 
-        /* 游戏公用 */
-        .game-title { color: var(--primary); margin-bottom: 15px; }
-        .btn-next { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-size: 1.1em; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 15px rgba(255,154,158,0.4); }
-
-        /* 选词游戏 */
-        .quiz-img { font-size: 100px; margin: 20px 0; }
-        .opt-btn { width: 80%; padding: 15px; margin: 10px; border-radius: 15px; border: 2px solid var(--secondary); background: white; font-size: 1.2em; cursor: pointer; }
-        .correct { background: #d4edda !important; border-color: #28a745 !important; }
-
-        /* 写字游戏 */
-        .writing-box {
-            background: #2c3e50; width: 280px; height: 280px;
-            border: 8px solid #8d6e63; border-radius: 10px;
-            position: relative; cursor: crosshair; touch-action: none;
+        /* 按钮 */
+        .btn {
+            background: var(--primary); color: white; border: none; padding: 12px 30px;
+            border-radius: 50px; font-size: 1.1em; cursor: pointer; margin: 10px 0;
+            box-shadow: 0 4px 10px rgba(255,154,158,0.3);
         }
-        .char-guide {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 200px; color: rgba(255,255,255,0.15); pointer-events: none;
-            user-select: none;
+
+        /* 写字板 */
+        .board {
+            background: #2c3e50; width: 260px; height: 260px; border: 6px solid #8d6e63;
+            border-radius: 10px; position: relative; touch-action: none;
+        }
+        .guide-txt {
+            position: absolute; width: 100%; height: 100%; display: flex;
+            justify-content: center; align-items: center; font-size: 180px;
+            color: rgba(255,255,255,0.1); pointer-events: none;
         }
         canvas { position: absolute; top: 0; left: 0; }
 
-        .btn-clear { background: #95a5a6; color: white; border: none; padding: 8px 20px; border-radius: 5px; margin-top: 10px; }
+        /* 游戏样式 */
+        .quiz-img { font-size: 80px; margin: 15px 0; }
+        .option-grid { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; }
+        .opt-btn { padding: 15px; border: 2px solid var(--secondary); border-radius: 10px; background: white; font-size: 1.1em; cursor: pointer; }
+        .opt-correct { background: #d4edda !important; border-color: #28a745 !important; }
 
+        .drop-zone {
+            min-height: 60px; width: 100%; border: 2px dashed #ccc; border-radius: 10px;
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; padding: 10px; background: #fafafa;
+        }
     </style>
 </head>
 <body>
 
 <div id="app">
     <div id="scr-start" class="screen active" style="justify-content: center;">
-        <div class="teacher">👩‍🏫</div>
-        <button class="btn-next" onclick="startAdventure()">点击进入梓辰的教室 🏫</button>
+        <div class="teacher-icon">👩‍🏫</div>
+        <button class="btn" onclick="initApp()">点击开始探险 🎈</button>
     </div>
 
     <div id="scr-intro" class="screen">
-        <div class="teacher">👩‍🏫</div>
+        <div class="teacher-icon">👩‍🏫</div>
         <div class="bubble" id="intro-msg"></div>
-        <button class="btn-next" onclick="goLearn()">好，开始学习！</button>
+        <button class="btn" onclick="startLearning()">好，我们开始吧！</button>
     </div>
 
     <div id="scr-learn" class="screen">
-        <h3 class="game-title">📚 跟着老师读 (P1-P5)</h3>
+        <h3 style="color:var(--primary); margin:0 0 10px 0;">📚 梓辰，点一点听声音</h3>
         <div class="scroll-area">
-            <div class="card-grid" id="learn-container"></div>
+            <div class="card-grid" id="learn-grid"></div>
         </div>
-        <button class="btn-next" onclick="startQuiz()">去玩游戏 🎮</button>
+        <button class="btn" onclick="startQuiz()">去挑战游戏 🎮</button>
     </div>
 
-    <div id="scr-q1" class="screen">
-        <h3 class="game-title">🎮 挑战一：看图选词</h3>
+    <div id="scr-quiz1" class="screen">
+        <h3 id="q1-title">挑战一：看图识字</h3>
         <div id="q1-icon" class="quiz-img"></div>
-        <div id="q1-opts" style="width: 100%;"></div>
+        <div class="option-grid" id="q1-options"></div>
+        <p id="q1-progress" style="margin-top:15px; color:#888;"></p>
     </div>
 
-    <div id="scr-q2" class="screen">
-        <h3 class="game-title">🎮 挑战二：排一排句子</h3>
-        <div id="q2-target" style="min-height: 80px; width: 90%; border: 2px dashed #ccc; margin: 10px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 5px; padding: 10px; border-radius: 10px;"></div>
-        <div id="q2-pool" style="display: flex; gap: 10px; margin-top: 20px;"></div>
-        <button class="btn-next" onclick="checkQ2()">检查答案</button>
+    <div id="scr-quiz2" class="screen">
+        <h3>挑战二：句子排排队</h3>
+        <p>点击下方词语拼成正确的句子：</p>
+        <div class="drop-zone" id="q2-target"></div>
+        <div id="q2-pool" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; justify-content:center;"></div>
+        <button class="btn" onclick="checkQ2()">检查答案 ✅</button>
     </div>
 
-    <div id="scr-q3" class="screen">
-        <h3 class="game-title">✍️ 挑战三：写生字</h3>
-        <p>梓辰，请跟着影子写出这个字：</p>
-        <div class="writing-box" id="paint-box">
-            <div class="char-guide" id="guide-char">老</div>
-            <canvas id="canvas" width="280" height="280"></canvas>
+    <div id="scr-quiz3" class="screen">
+        <h3>挑战三：我是小小书法家</h3>
+        <div class="board">
+            <div class="guide-txt" id="writing-guide"></div>
+            <canvas id="canvas" width="260" height="260"></canvas>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn-clear" onclick="clearCanvas()">擦掉重写</button>
-            <button class="btn-next" id="btn-next-char" onclick="nextChar()" style="margin-top:10px">写好了</button>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button onclick="clearCanvas()" style="padding:8px 15px;">重写</button>
+            <button class="btn" onclick="nextWriteChar()" style="margin:0">写好了</button>
         </div>
+        <p id="write-msg" style="color:var(--primary); font-weight:bold;"></p>
     </div>
 
     <div id="scr-outro" class="screen">
-        <div class="teacher">👋</div>
+        <div class="teacher-icon">👋</div>
         <div class="bubble" id="outro-msg"></div>
-        <button class="btn-next" onclick="location.reload()">重新学习</button>
+        <button class="btn" onclick="location.reload()">再学一次</button>
     </div>
 </div>
 
 <script>
-    // --- 数据：完全根据PDF P1-P5 ---
-    const data = {
-        intro: "嗨，梓辰，我是你的小老师，让我们一起来学华语吧，好吗？",
-        outro: "梓辰真棒！我们任务都完成啦，下次见哟，拜拜！",
-        p1: [
-            { t: 'w', zh: '老师', py: 'lǎo shī', icon: '👩‍🏫' },
-            { t: 'w', zh: '同学', py: 'tóng xué', icon: '👦' },
-            { t: 'w', zh: '幼儿园', py: 'yòu ér yuán', icon: '🏫' },
-            { t: 's', zh: '这是我的幼儿园。', py: '', icon: '🏫' }
-        ],
-        others: [
-            { t: 'w', zh: '课室', py: 'kè shì', icon: '🖍️' },
-            { t: 'w', zh: '电脑室', py: 'diàn nǎo shì', icon: '💻' },
-            { t: 's', zh: '幼儿园里有课室。', py: '', icon: '🏠' },
-            { t: 'w', zh: '游乐场', py: 'yóu lè chǎng', icon: '🎡' },
-            { t: 's', zh: '游乐场旁边有厕所。', py: '', icon: '🚻' },
-            { t: 'w', zh: '园长', py: 'yuán zhǎng', icon: '👩‍💼' },
-            { t: 's', zh: '校车司机接送我们上下学。', py: '', icon: '🚌' }
-        ]
-    };
+    // --- 数据中心：严格匹配 PDF P1-P5 ---
+    const lessonData = [
+        // Page 1
+        { p: 1, t: 'w', zh: '老师', py: 'lǎo shī', icon: '👩‍🏫' },
+        { p: 1, t: 'w', zh: '同学', py: 'tóng xué', icon: '👧' },
+        { p: 1, t: 'w', zh: '幼儿园', py: 'yòu ér yuán', icon: '🏫' },
+        { p: 1, t: 's', zh: '这是我的幼儿园。', icon: '🏫' },
+        // Page 2
+        { p: 2, t: 'w', zh: '课室', py: 'kè shì', icon: '🖍️' },
+        { p: 2, t: 'w', zh: '电脑室', py: 'diàn nǎo shì', icon: '💻' },
+        { p: 2, t: 'w', zh: '办公室', py: 'bàn gōng shì', icon: '🏢' },
+        { p: 2, t: 'w', zh: '学习角落', py: 'xué xí jiǎo luò', icon: '🧩' },
+        { p: 2, t: 's', zh: '幼儿园里有课室。', icon: '🏠' },
+        // Page 3
+        { p: 3, t: 'w', zh: '游乐场', py: 'yóu lè chǎng', icon: '🎡' },
+        { p: 3, t: 'w', zh: '厕所', py: 'cè suǒ', icon: '🚻' },
+        { p: 3, t: 'w', zh: '礼堂', py: 'lǐ táng', icon: '🎤' },
+        { p: 3, t: 's', zh: '游乐场旁边有厕所。', icon: '🚻' },
+        // Page 4
+        { p: 4, t: 'w', zh: '园长', py: 'yuán zhǎng', icon: '👨‍💼' },
+        { p: 4, t: 's', zh: '课室里有同学。', icon: '👫' },
+        // Page 5
+        { p: 5, t: 'w', zh: '校车司机', py: 'xiào chē sī jī', icon: '🚌' },
+        { p: 5, t: 'w', zh: '园工', py: 'yuán gōng', icon: '👨‍🌾' },
+        { p: 5, t: 's', zh: '校车司机接送我们上下学。', icon: '🚐' }
+    ];
 
-    const speech = window.speechSynthesis;
-    let canvas, ctx, painting = false;
+    const writeChars = ['老', '师', '学', '校', '园'];
+    let writeIdx = 0;
 
-    // --- 核心语音函数 ---
-    function say(text, rate = 0.8, callback) {
-        speech.cancel();
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'zh-CN';
-        msg.rate = rate; // 速度
-        if (callback) msg.onend = callback;
-        speech.speak(msg);
+    const quizSentences = [
+        { s: '这是我的幼儿园', parts: ['这是', '我的', '幼儿园'] },
+        { s: '幼儿园里有课室', parts: ['幼儿园', '里有', '课室'] },
+        { s: '游乐场旁边有厕所', parts: ['游乐场', '旁边', '有厕所'] },
+        { s: '课室里有同学', parts: ['课室里', '有', '同学'] }
+    ];
+
+    const introTxt = "嗨，梓辰，我是你的小老师，让我们一起来学华语吧，好吗？";
+    const outroTxt = "梓辰真棒！我们任务都完成啦，下次见哟，拜拜！";
+
+    // --- 语音引擎 ---
+    function speak(txt, rate = 0.8, cb) {
+        window.speechSynthesis.cancel();
+        const m = new SpeechSynthesisUtterance(txt);
+        m.lang = 'zh-CN'; m.rate = rate;
+        if(cb) m.onend = cb;
+        window.speechSynthesis.speak(m);
     }
 
     function show(id) {
@@ -172,128 +192,155 @@
         document.getElementById(id).classList.add('active');
     }
 
-    // --- 流程 ---
-    function startAdventure() {
+    // --- 逻辑控制 ---
+    function initApp() {
         show('scr-intro');
-        document.getElementById('intro-msg').innerText = data.intro;
-        say(data.intro, 0.8);
+        document.getElementById('intro-msg').innerText = introTxt;
+        speak(introTxt, 0.85);
     }
 
-    function goLearn() {
+    function startLearning() {
         show('scr-learn');
-        const container = document.getElementById('learn-container');
-        container.innerHTML = '';
-        const allItems = [...data.p1, ...data.others];
-        
-        allItems.forEach(item => {
-            const div = document.createElement('div');
-            div.className = `card ${item.t === 's' ? 'sentence' : ''}`;
-            div.innerHTML = `<div class="card-icon">${item.icon}</div>
-                             <div class="card-zh">${item.zh}</div>
-                             <div class="card-py">${item.py}</div>`;
-            div.onclick = () => say(item.zh, 0.7); // 学习部分语速0.7
-            container.appendChild(div);
+        const g = document.getElementById('learn-grid');
+        g.innerHTML = '';
+        lessonData.forEach(item => {
+            const c = document.createElement('div');
+            c.className = `card ${item.t === 's' ? 'full-width' : ''}`;
+            c.innerHTML = `<div class="card-icon">${item.icon}</div>
+                           <div class="card-zh">${item.zh}</div>
+                           <div class="card-py">${item.py || ''}</div>`;
+            c.onclick = () => speak(item.zh, 0.7);
+            g.appendChild(c);
         });
-        say("点一点卡片，听听老师怎么读，要跟着念哦！", 0.8);
+        speak("梓辰，请点一点这些卡片，听听老师怎么读，要跟着大声读哦！");
     }
 
-    // --- 游戏 1 (选词) ---
+    // --- 识字游戏 (10+ 题) ---
+    let q1Idx = 0;
+    let q1Pool = [];
+
     function startQuiz() {
-        show('scr-q1');
+        q1Idx = 0;
+        q1Pool = lessonData.filter(d => d.t === 'w').sort(() => 0.5 - Math.random());
+        show('scr-quiz1');
         loadQ1();
     }
+
     function loadQ1() {
-        const item = data.p1[0]; // 老师
+        if(q1Idx >= q1Pool.length) { startQ2(); return; }
+        const item = q1Pool[q1Idx];
         document.getElementById('q1-icon').innerText = item.icon;
-        const opts = document.getElementById('q1-opts');
+        document.getElementById('q1-progress').innerText = `第 ${q1Idx+1} / ${q1Pool.length} 题`;
+        
+        const opts = document.getElementById('q1-options');
         opts.innerHTML = '';
-        ['同学', '老师'].forEach(txt => {
+        
+        const wrong = q1Pool.filter(i => i.zh !== item.zh)[Math.floor(Math.random() * (q1Pool.length-1))];
+        [item, wrong].sort(() => 0.5 - Math.random()).forEach(o => {
             const b = document.createElement('button');
             b.className = 'opt-btn';
-            b.innerText = txt;
+            b.innerText = o.zh;
             b.onclick = () => {
-                if (txt === '老师') {
-                    b.classList.add('correct'); say("答对了！");
-                    setTimeout(startQ2, 1000);
-                } else { say("不对哦，再选选？"); }
+                if(o.zh === item.zh) {
+                    b.classList.add('opt-correct'); speak("答对了！");
+                    setTimeout(() => { q1Idx++; loadQ1(); }, 800);
+                } else { speak("不对哦，再选选看。"); }
             };
             opts.appendChild(b);
         });
     }
 
-    // --- 游戏 2 (排句) ---
+    // --- 拼句游戏 ---
+    let q2Idx = 0;
     function startQ2() {
-        show('scr-q2');
+        q2Idx = 0;
+        show('scr-quiz2');
+        loadQ2();
+    }
+
+    function loadQ2() {
+        if(q2Idx >= quizSentences.length) { startQ3(); return; }
+        const data = quizSentences[q2Idx];
         const target = document.getElementById('q2-target');
         const pool = document.getElementById('q2-pool');
-        const parts = ['这是', '我的', '幼儿园'];
-        parts.sort(() => Math.random() - 0.5).forEach(p => {
-            const div = document.createElement('div');
-            div.style = "padding:10px 15px; background:white; border:2px solid var(--primary); border-radius:10px; cursor:pointer; font-weight:bold;";
-            div.innerText = p;
-            div.onclick = () => {
-                if (div.parentElement === pool) target.appendChild(div);
-                else pool.appendChild(div);
-                say(p);
+        target.innerHTML = ''; pool.innerHTML = '';
+        
+        [...data.parts].sort(() => 0.5 - Math.random()).forEach(p => {
+            const d = document.createElement('div');
+            d.style = "padding:10px 15px; background:white; border:2px solid var(--primary); border-radius:10px; cursor:pointer;";
+            d.innerText = p;
+            d.onclick = () => {
+                if(d.parentElement === pool) target.appendChild(d);
+                else pool.appendChild(d);
+                speak(p);
             };
-            pool.appendChild(div);
+            pool.appendChild(d);
         });
+        speak("把下面的词语排排队。");
     }
+
     function checkQ2() {
         const res = Array.from(document.getElementById('q2-target').children).map(e => e.innerText).join('');
-        if (res === '这是我的幼儿园') { say("太棒了！梓辰真聪明。"); setTimeout(startQ3, 1000); }
-        else say("顺序不太对，重新排排看？");
+        if(res === quizSentences[q2Idx].s) {
+            speak("太棒了！拼对了。");
+            setTimeout(() => { q2Idx++; loadQ2(); }, 1000);
+        } else { speak("顺序不太对，再试一次。"); }
     }
 
-    // --- 游戏 3 (写字) ---
+    // --- 写字游戏 ---
     function startQ3() {
-        show('scr-q3');
+        show('scr-quiz3');
+        writeIdx = 0;
         initCanvas();
-        say("梓辰，跟着影子写写“老师”这两个字吧。先写“老”。");
+        loadWriteChar();
     }
 
-    function initCanvas() {
-        canvas = document.getElementById('canvas');
-        ctx = canvas.getContext('2d');
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 12;
-        ctx.lineCap = "round";
-
-        const startDraw = (e) => { painting = true; draw(e); };
-        const endDraw = () => { painting = false; ctx.beginPath(); };
-        const draw = (e) => {
-            if (!painting) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
-            ctx.lineTo(x, y);
-            ctx.stroke();
-        };
-
-        canvas.onmousedown = startDraw; canvas.onmouseup = endDraw; canvas.onmousemove = draw;
-        canvas.ontouchstart = startDraw; canvas.ontouchend = endDraw; canvas.ontouchmove = draw;
+    function loadWriteChar() {
+        const char = writeChars[writeIdx];
+        document.getElementById('writing-guide').innerText = char;
+        document.getElementById('write-msg').innerText = `请写“${char}”字`;
+        clearCanvas();
+        speak(`梓辰，跟着影子写写这个“${char}”字吧。`);
     }
 
-    let currentChar = 0;
-    function nextChar() {
-        if (currentChar === 0) {
-            currentChar = 1;
-            document.getElementById('guide-char').innerText = "师";
-            clearCanvas();
-            say("写得真好！接下来写“师”。");
+    function nextWriteChar() {
+        writeIdx++;
+        if(writeIdx < writeChars.length) {
+            loadWriteChar();
         } else {
             finish();
         }
     }
 
-    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-
     // --- 结尾 ---
     function finish() {
         show('scr-outro');
-        document.getElementById('outro-msg').innerText = data.outro;
-        say(data.outro, 0.8);
+        document.getElementById('outro-msg').innerText = outroTxt;
+        speak(outroTxt, 0.85);
     }
+
+    // --- 画布逻辑 ---
+    let canvas, ctx, painting = false;
+    function initCanvas() {
+        canvas = document.getElementById('canvas');
+        ctx = canvas.getContext('2d');
+        ctx.strokeStyle = "white"; ctx.lineWidth = 12; ctx.lineCap = "round";
+        const getXY = (e) => {
+            const r = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - r.left;
+            const y = (e.clientY || e.touches[0].clientY) - r.top;
+            return [x, y];
+        }
+        const start = (e) => { painting = true; ctx.beginPath(); const [x,y]=getXY(e); ctx.moveTo(x,y); };
+        const move = (e) => { if(!painting) return; const [x,y]=getXY(e); ctx.lineTo(x,y); ctx.stroke(); };
+        const end = () => painting = false;
+        
+        canvas.onmousedown = start; canvas.onmousemove = move; canvas.onmouseup = end;
+        canvas.ontouchstart = (e) => { e.preventDefault(); start(e); };
+        canvas.ontouchmove = (e) => { e.preventDefault(); move(e); };
+        canvas.ontouchend = end;
+    }
+    function clearCanvas() { ctx.clearRect(0,0,260,260); }
 </script>
 </body>
 </html>
