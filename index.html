@@ -3,255 +3,504 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>幼儿园快乐学 - 小小探险家</title>
+    <title>梓辰的华语乐园</title>
     <style>
         :root {
-            --primary-color: #FF9A9E;
-            --secondary-color: #FECFEF;
-            --accent-color: #4facfe;
-            --text-color: #444;
-            --card-bg: #ffffff;
+            --primary: #FF9A9E;
+            --secondary: #a1c4fd;
+            --accent: #ff6b6b;
+            --text: #444;
+            --bg-gradient: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-gradient);
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
         }
 
-        h1 {
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        /* 通用容器 */
+        .container {
+            width: 90%;
+            max-width: 800px;
             text-align: center;
+            padding: 20px;
+            display: none; /* 默认隐藏，通过 JS 控制显示 */
+            animation: fadeIn 0.5s ease;
         }
 
-        .controls {
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px 20px;
-            border-radius: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        select {
-            padding: 10px;
-            border-radius: 15px;
-            border: 2px solid var(--accent-color);
-            font-size: 16px;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            width: 100%;
-            max-width: 1200px;
-            padding-bottom: 50px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        /* 老师形象区域 */
+        .teacher-avatar {
+            width: 150px;
+            height: 150px;
+            background-color: #fff;
+            border-radius: 50%;
+            border: 5px solid var(--primary);
+            margin: 0 auto 20px;
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            text-align: center;
-            position: relative;
-            border: 4px solid transparent;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-            border-color: var(--accent-color);
-        }
-
-        .card-image {
-            width: 100%;
-            height: 180px;
-            background-color: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 60px;
-            object-fit: cover;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-
-        /* 如果你有真实的图片，img标签会覆盖上面的emoji */
-        .card-image img {
+        
+        .teacher-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .card-content {
-            padding: 15px;
+        .speech-bubble {
+            background: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            color: var(--text);
         }
 
-        .hanzi {
-            font-size: 32px;
-            color: #333;
-            font-weight: bold;
-            margin: 5px 0;
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 0 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent #fff;
         }
 
-        .pinyin {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 10px;
-            font-family: Arial, sans-serif;
-        }
-
-        .icon-sound {
-            background-color: var(--accent-color);
+        /* 按钮样式 */
+        .btn {
+            background: var(--primary);
             color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: inline-flex;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background: #ff8085;
+        }
+
+        .btn-secondary { background: var(--secondary); }
+
+        /* 学习卡片网格 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 3px solid transparent;
+        }
+
+        .card:hover { transform: translateY(-5px); border-color: var(--secondary); }
+        .card.playing { border-color: var(--accent); animation: pulse 1s infinite; }
+
+        .card-img-placeholder {
+            height: 120px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 5px;
-            font-size: 20px;
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .card-img-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
         }
 
-        /* 简单的动画效果 */
+        .hanzi { font-size: 1.5em; font-weight: bold; color: #333; margin: 5px 0; }
+        .pinyin { color: #888; font-size: 0.9em; }
+
+        /* 游戏区域 */
+        .game-area {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+        
+        .option-btn:hover { background: #e3f2fd; }
+        .option-btn.correct { background: #d4edda; border-color: #c3e6cb; }
+        .option-btn.wrong { background: #f8d7da; border-color: #f5c6cb; }
+
+        /* 排字游戏 */
+        .sentence-scramble {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            min-height: 60px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #ccc;
+        }
+
+        .word-tile {
+            background: white;
+            border: 2px solid var(--secondary);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            user-select: none;
+        }
+
+        .word-pool { margin-top: 20px; }
+
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.02); }
             100% { transform: scale(1); }
         }
 
-        .playing .icon-sound {
-            animation: pulse 1s infinite;
-            background-color: #ff6b6b;
+        /* 导航栏 */
+        .nav-bar {
+            width: 100%;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
+        
+        .hidden { display: none !important; }
 
-        footer {
-            margin-top: auto;
-            color: #666;
-            font-size: 0.9em;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
 
-    <h1>🏫 幼儿园快乐学</h1>
-    
-    <div class="controls">
-        <label>选择课程：</label>
-        <select id="unit-selector" onchange="renderCards()">
-            <option value="unit1">单元一：开学探险日 (认识校园)</option>
-            <option value="unit2">单元二：一起玩耍 (社交礼仪)</option>
-            <option value="unit3">识字小课堂 (室与玩)</option>
-        </select>
+    <div id="intro-screen" class="container active">
+        <div class="teacher-avatar">
+            <img src="https://via.placeholder.com/150/FF9A9E/FFFFFF?text=老师" alt="老师" id="teacher-img-intro">
+        </div>
+        <div class="speech-bubble">
+            “嗨，梓辰，我是你的小老师！<br>让我们一起来学华语吧，好吗？”
+        </div>
+        <button class="btn" onclick="startLearning()">好，开始学习！🚀</button>
     </div>
 
-    <div class="grid-container" id="game-board">
+    <div id="learn-screen" class="container">
+        <div class="nav-bar">
+            <button class="btn btn-secondary" style="font-size: 0.9em; padding: 8px 20px;" onclick="showSection('intro-screen')">🏠 返回</button>
+            <h2>📚 点一点，听声音</h2>
+            <button class="btn" style="font-size: 0.9em; padding: 8px 20px;" onclick="startGames()">玩游戏 🎮</button>
         </div>
 
-    <footer>
-        <p>点击卡片听声音，跟着大声读出来哦！</p>
-    </footer>
+        <div id="cards-container" class="grid">
+            </div>
+        
+        <div class="speech-bubble">
+            “梓辰，上面的卡片都点了吗？<br>学好了就点击右上角的‘玩游戏’哦！”
+        </div>
+    </div>
+
+    <div id="game1-screen" class="container">
+        <h2>🎮 游戏一：看图选一选</h2>
+        <div class="game-area">
+            <div class="card-img-placeholder" style="height: 200px;">
+                <img id="quiz-img" src="" alt="Quiz Image">
+            </div>
+            <div id="quiz-options" class="quiz-options">
+                </div>
+            <p id="quiz-feedback" style="height: 20px; color: var(--accent); font-weight: bold;"></p>
+        </div>
+    </div>
+
+    <div id="game2-screen" class="container">
+        <h2>🎮 游戏二：把句子排排队</h2>
+        <div class="game-area">
+            <p>请把下面的词语按顺序放进框框里：</p>
+            <div id="sentence-target" class="sentence-scramble">
+                </div>
+            <div id="sentence-pool" class="sentence-scramble" style="border: none; background: transparent;">
+                </div>
+            <button class="btn" onclick="checkSentenceOrder()">检查答案 ✅</button>
+            <p id="sentence-feedback" style="height: 20px; font-weight: bold;"></p>
+        </div>
+    </div>
+
+    <div id="outro-screen" class="container">
+        <div class="teacher-avatar">
+            <img src="https://via.placeholder.com/150/FF9A9E/FFFFFF?text=老师" alt="老师" id="teacher-img-outro">
+        </div>
+        <div class="speech-bubble">
+            “梓辰真棒！🎉<br>所有的任务都完成啦！<br>我们下次见哟，拜拜！👋”
+        </div>
+        <button class="btn btn-secondary" onclick="location.reload()">再玩一次 🔄</button>
+    </div>
 
     <script>
-        // --- 1. 数据准备 (基于你的 PDF 内容) ---
-        const gameData = {
-            unit1: [
-                { text: "老师", pinyin: "lǎo shī", emoji: "👩‍🏫", image: "" },
-                { text: "同学", pinyin: "tóng xué", emoji: "🎒", image: "" },
-                { text: "幼儿园", pinyin: "yòu ér yuán", emoji: "🏫", image: "" },
-                { text: "课室", pinyin: "kè shì", emoji: "🖍️", image: "" },
-                { text: "电脑室", pinyin: "diàn nǎo shì", emoji: "💻", image: "" },
-                { text: "办公室", pinyin: "bàn gōng shì", emoji: "🖨️", image: "" },
-                { text: "游乐场", pinyin: "yóu lè chǎng", emoji: "🎡", image: "" },
-                { text: "厕所", pinyin: "cè suǒ", emoji: "🚽", image: "" },
-                { text: "礼堂", pinyin: "lǐ táng", emoji: "🎤", image: "" },
-                { text: "校车司机", pinyin: "xiào chē sī jī", emoji: "🚌", image: "" },
-                { text: "园工", pinyin: "yuán gōng", emoji: "👨‍🌾", image: "" }
-            ],
-            unit2: [
-                { text: "朋友", pinyin: "péng yǒu", emoji: "👫", image: "" },
-                { text: "打招呼", pinyin: "dǎ zhāo hu", emoji: "👋", image: "" },
-                { text: "排队", pinyin: "pái duì", emoji: "🚶‍♂️🚶‍♀️", image: "" },
-                { text: "牵手", pinyin: "qiān shǒu", emoji: "🤝", image: "" },
-                { text: "拥抱", pinyin: "yōng bào", emoji: "🫂", image: "" },
-                { text: "分享", pinyin: "fēn xiǎng", emoji: "🍰", image: "" }
-            ],
-            unit3: [
-                { text: "室", pinyin: "shì (课室)", emoji: "🏠", image: "" },
-                { text: "玩", pinyin: "wán (玩具)", emoji: "🪁", image: "" },
-                { text: "宝盖儿", pinyin: "bǎo gài er (宀)", emoji: "roof", image: "" },
-                { text: "王字旁", pinyin: "wáng zì páng (王)", emoji: "👑", image: "" }
-            ]
-        };
-
-        // --- 2. 语音合成功能 (Text-to-Speech) ---
-        function speak(text, cardElement) {
-            // 停止当前正在播放的声音
-            window.speechSynthesis.cancel();
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'zh-CN'; // 设置为中文
-            utterance.rate = 0.8; // 语速稍慢，适合小朋友
-            utterance.pitch = 1.1; // 语调稍高，更有亲和力
-
-            // 动画效果
-            cardElement.classList.add('playing');
+        // --- 数据中心 (基于 PDF Page 1-5) ---
+        // 提示：你需要把 image 字段换成你截图的文件名，例如 'images/laoshi.jpg'
+        
+        const contentData = [
+            // Page 1
+            { type: 'word', text: '老师', pinyin: 'lǎo shī', emoji: '👩‍🏫', page: 1 },
+            { type: 'word', text: '同学', pinyin: 'tóng xué', emoji: '🎒', page: 1 },
+            { type: 'word', text: '幼儿园', pinyin: 'yòu ér yuán', emoji: '🏫', page: 1 },
+            { type: 'sentence', text: '这是我的幼儿园。', pinyin: 'zhè shì wǒ de yòu ér yuán', emoji: '🖼️', page: 1 },
             
-            utterance.onend = function() {
-                cardElement.classList.remove('playing');
-            };
+            // Page 2
+            { type: 'word', text: '课室', pinyin: 'kè shì', emoji: '🖍️', page: 2 },
+            { type: 'word', text: '电脑室', pinyin: 'diàn nǎo shì', emoji: '💻', page: 2 },
+            { type: 'sentence', text: '幼儿园里有课室。', pinyin: 'yòu ér yuán lǐ yǒu kè shì', emoji: '🏫', page: 2 },
+            
+            // Page 3
+            { type: 'word', text: '游乐场', pinyin: 'yóu lè chǎng', emoji: '🎡', page: 3 },
+            { type: 'word', text: '礼堂', pinyin: 'lǐ táng', emoji: '🎤', page: 3 },
+            { type: 'sentence', text: '游乐场旁边有厕所。', pinyin: 'yóu lè chǎng páng biān yǒu cè suǒ', emoji: '🚽', page: 3 },
 
+            // Page 4
+            { type: 'word', text: '园长', pinyin: 'yuán zhǎng', emoji: '👨‍💼', page: 4 },
+            { type: 'sentence', text: '课室里有同学。', pinyin: 'kè shì lǐ yǒu tóng xué', emoji: '👦👧', page: 4 },
+
+            // Page 5
+            { type: 'word', text: '校车司机', pinyin: 'xiào chē sī jī', emoji: '🚌', page: 5 },
+            { type: 'sentence', text: '校车司机接送我们。', pinyin: 'xiào chē sī jī jiē sòng wǒ men', emoji: '🚍', page: 5 }
+        ];
+
+        // 游戏数据
+        let currentQuizIndex = 0;
+        const quizQuestions = [
+            { correct: '老师', options: ['老师', '同学'], emoji: '👩‍🏫' },
+            { correct: '游乐场', options: ['礼堂', '游乐场'], emoji: '🎡' },
+            { correct: '校车司机', options: ['园长', '校车司机'], emoji: '🚌' }
+        ];
+
+        let currentSentenceIndex = 0;
+        const sentenceChallenges = [
+            { text: '这是我的幼儿园', parts: ['这是', '我的', '幼儿园'] },
+            { text: '幼儿园里有课室', parts: ['幼儿园', '里', '有', '课室'] },
+            { text: '课室里有同学', parts: ['课室', '里', '有', '同学'] }
+        ];
+
+        // --- 核心功能 ---
+
+        function showSection(id) {
+            document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            
+            // 每次切换界面都尝试播放一点音效或语音（可选）
+            if(id === 'intro-screen') speak("嗨，梓辰");
+            if(id === 'outro-screen') speak("梓辰真棒");
+        }
+
+        function speak(text, callback) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = 0.8; 
+            utterance.onend = callback;
             window.speechSynthesis.speak(utterance);
         }
 
-        // --- 3. 渲染页面 ---
-        function renderCards() {
-            const unit = document.getElementById('unit-selector').value;
-            const container = document.getElementById('game-board');
-            container.innerHTML = ''; // 清空当前内容
+        // --- 学习模式 ---
+        function startLearning() {
+            showSection('learn-screen');
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
 
-            const items = gameData[unit];
-
-            items.forEach(item => {
+            contentData.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                
-                // 如果你有图片文件，可以在 data 中填入路径，这里优先显示 Emoji
-                const visualContent = item.image ? 
-                    `<img src="${item.image}" alt="${item.text}">` : 
-                    `${item.emoji}`;
+                // 这里使用Emoji作为占位符，用户有了图片后，代码会自动优先加载img标签
+                // 如果用户没有设置 contentData 里的 image 路径，则显示 Emoji
+                const visual = item.image ? 
+                    `<img src="${item.image}" style="width:100%; height:100%; object-fit:contain;">` : 
+                    item.emoji;
 
                 card.innerHTML = `
-                    <div class="card-image">${visualContent}</div>
-                    <div class="card-content">
-                        <div class="hanzi">${item.text}</div>
-                        <div class="pinyin">${item.pinyin}</div>
-                        <div class="icon-sound">🔊</div>
-                    </div>
+                    <div class="card-img-placeholder">${visual}</div>
+                    <div class="hanzi">${item.text}</div>
+                    <div class="pinyin">${item.pinyin}</div>
                 `;
-
-                // 点击事件
-                card.onclick = () => speak(item.text, card);
-
+                
+                card.onclick = () => {
+                    card.classList.add('playing');
+                    speak(item.text, () => card.classList.remove('playing'));
+                };
+                
                 container.appendChild(card);
+            });
+            
+            speak("这是学习卡片，点击它们听听怎么读");
+        }
+
+        // --- 游戏流程控制 ---
+        function startGames() {
+            currentQuizIndex = 0;
+            currentSentenceIndex = 0;
+            speak("我们来玩个游戏吧，看图选答案");
+            loadQuiz();
+            showSection('game1-screen');
+        }
+
+        // --- 游戏 1: 选择题 ---
+        function loadQuiz() {
+            if (currentQuizIndex >= quizQuestions.length) {
+                // 进入下一个游戏
+                speak("太棒了，现在我们来玩排字游戏");
+                loadSentenceGame();
+                showSection('game2-screen');
+                return;
+            }
+
+            const q = quizQuestions[currentQuizIndex];
+            // 更新图片 (同样逻辑，有图用图，没图用Emoji)
+            const imgContainer = document.getElementById('quiz-img');
+            // 为了演示，这里用 Placeholder 服务生成带文字的图，实际使用时请换成 q.image
+            imgContainer.src = q.image || `https://via.placeholder.com/300x200/a1c4fd/fff?text=${q.emoji}`; 
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            document.getElementById('quiz-feedback').innerText = '';
+
+            // 打乱选项顺序
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkQuizAnswer(opt, q.correct, btn);
+                optionsContainer.appendChild(btn);
             });
         }
 
-        // 初始化
-        window.onload = renderCards;
+        function checkQuizAnswer(selected, correct, btnElement) {
+            if (selected === correct) {
+                btnElement.classList.add('correct');
+                document.getElementById('quiz-feedback').innerText = "答对啦！真棒！🌟";
+                speak("答对啦", () => {
+                    setTimeout(() => {
+                        currentQuizIndex++;
+                        loadQuiz();
+                    }, 1000);
+                });
+            } else {
+                btnElement.classList.add('wrong');
+                document.getElementById('quiz-feedback').innerText = "不对哦，再试一次。";
+                speak("不对哦");
+            }
+        }
+
+        // --- 游戏 2: 排字游戏 ---
+        function loadSentenceGame() {
+            if (currentSentenceIndex >= sentenceChallenges.length) {
+                // 全部通关
+                showSection('outro-screen');
+                return;
+            }
+
+            const challenge = sentenceChallenges[currentSentenceIndex];
+            const pool = document.getElementById('sentence-pool');
+            const target = document.getElementById('sentence-target');
+            document.getElementById('sentence-feedback').innerText = '';
+            
+            pool.innerHTML = '';
+            target.innerHTML = '';
+
+            // 打乱词语
+            const shuffledParts = [...challenge.parts].sort(() => Math.random() - 0.5);
+
+            shuffledParts.forEach(word => {
+                const tile = document.createElement('div');
+                tile.className = 'word-tile';
+                tile.innerText = word;
+                tile.onclick = function() {
+                    // 点击词语，在“目标区”和“备选区”之间移动
+                    if (this.parentElement === pool) {
+                        target.appendChild(this);
+                    } else {
+                        pool.appendChild(this);
+                    }
+                };
+                pool.appendChild(tile);
+            });
+        }
+
+        function checkSentenceOrder() {
+            const challenge = sentenceChallenges[currentSentenceIndex];
+            const userWords = Array.from(document.getElementById('sentence-target').children).map(el => el.innerText);
+            const userSentence = userWords.join('');
+            
+            // 简单去除标点比较
+            const cleanTarget = challenge.text.replace(/[。，]/g, '');
+            const cleanUser = userSentence.replace(/[。，]/g, '');
+
+            if (cleanUser === cleanTarget) {
+                document.getElementById('sentence-feedback').innerText = "排对啦！梓辰好厉害！🎉";
+                document.getElementById('sentence-feedback').style.color = "green";
+                speak("排对啦", () => {
+                    setTimeout(() => {
+                        currentSentenceIndex++;
+                        loadSentenceGame();
+                    }, 1500);
+                });
+            } else {
+                document.getElementById('sentence-feedback').innerText = "顺序好像不对，再读一遍？";
+                document.getElementById('sentence-feedback').style.color = "red";
+                speak("顺序好像不对");
+            }
+        }
 
     </script>
 </body>
