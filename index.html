@@ -6,389 +6,294 @@
     <title>梓辰的华语乐园</title>
     <style>
         :root {
-            --primary: #FF9A9E; /* 温柔粉 */
-            --secondary: #a1c4fd; /* 天空蓝 */
-            --accent: #fbc2eb; /* 亮粉点缀 */
-            --text: #555;
-            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            --card-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            --primary: #FF9A9E;
+            --secondary: #a1c4fd;
+            --accent: #fbc2eb;
+            --text: #444;
+            --chalk: rgba(255, 255, 255, 0.8);
         }
 
         body {
-            font-family: 'Comic Sans MS', 'Microsoft YaHei', 'Rounded Mplus 1c', sans-serif;
-            background: var(--bg-gradient);
-            margin: 0;
-            padding: 15px;
-            min-height: 100vh;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'Helvetica Neue', 'PingFang SC', sans-serif;
+            background: #f0f4f8; margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
 
-        .screen-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 30px;
-            padding: 30px;
-            width: 100%;
-            max-width: 700px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            text-align: center;
-            display: none; /* 默认隐藏 */
-            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-        
-        .screen-container.active { display: block; }
-
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        #app {
+            width: 100%; max-width: 600px; height: 95vh;
+            background: white; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; overflow: hidden; position: relative;
         }
 
-        h1, h2 { color: var(--primary); text-shadow: 1px 1px 2px rgba(0,0,0,0.1); margin-top: 0;}
+        .screen { display: none; padding: 20px; flex-direction: column; align-items: center; text-align: center; height: 100%; box-sizing: border-box; }
+        .active { display: flex; }
 
-        /* --- 老师形象 (CSS自动生成) --- */
-        .teacher-avatar {
-            font-size: 100px;
-            background: #fff0f5;
-            width: 150px;
-            height: 150px;
-            line-height: 150px;
-            border-radius: 50%;
-            border: 6px solid var(--primary);
-            margin: 0 auto 20px;
-            box-shadow: var(--card-shadow);
-            animation: float 3s ease-in-out infinite;
-        }
+        /* 老师动画 */
+        .teacher { font-size: 90px; margin-bottom: 10px; animation: wave 2s infinite; }
+        @keyframes wave { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(10deg); } }
 
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        /* --- 对话气泡 --- */
         .bubble {
-            background: #fff;
-            border: 3px solid var(--secondary);
-            padding: 20px;
-            border-radius: 25px;
-            position: relative;
-            font-size: 1.2em;
-            color: var(--text);
-            margin-bottom: 30px;
-        }
-        .bubble::after {
-            content: ''; position: absolute; top: -15px; left: 50%; margin-left: -10px;
-            border-width: 0 10px 15px; border-style: solid; border-color: transparent transparent var(--secondary);
+            background: #fff; border: 4px solid var(--primary); padding: 15px;
+            border-radius: 20px; position: relative; margin-bottom: 20px;
+            font-size: 1.2em; color: var(--text); font-weight: bold;
         }
 
-        /* --- 通用按钮 --- */
-        .btn {
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            border: none; color: white; padding: 12px 30px; font-size: 1.3em;
-            border-radius: 50px; cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        /* 学习网格 */
+        .scroll-area { width: 100%; overflow-y: auto; flex: 1; padding: 10px; }
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .card {
+            background: #fff; border: 2px solid #eee; border-radius: 15px;
+            padding: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(255, 154, 158, 0.6); }
-        .btn:active { transform: scale(0.98); }
+        .card:hover { border-color: var(--primary); transform: scale(1.02); }
+        .card-icon { font-size: 45px; }
+        .card-zh { font-size: 1.3em; font-weight: bold; margin: 5px 0; }
+        .sentence { grid-column: span 2; background: #fff9fa; border-left: 5px solid var(--primary); text-align: left; padding: 15px; }
 
-        /* --- 学习卡片网格 --- */
-        .grid-layout {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .learn-card {
-            background: white; border-radius: 20px; padding: 15px;
-            box-shadow: var(--card-shadow); cursor: pointer;
-            transition: all 0.3s; border: 3px solid transparent;
-        }
-        .learn-card:hover { transform: translateY(-5px); border-color: var(--secondary); }
-        .learn-card.playing { border-color: var(--accent); animation: pulse 1s infinite; }
-        .card-icon { font-size: 60px; display: block; margin-bottom: 5px; }
-        .card-text { font-size: 1.3em; font-weight: bold; color: #444; margin: 5px 0; }
-        .card-pinyin { font-size: 0.9em; color: #999; }
+        /* 游戏公用 */
+        .game-title { color: var(--primary); margin-bottom: 15px; }
+        .btn-next { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-size: 1.1em; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 15px rgba(255,154,158,0.4); }
 
-        /* --- 游戏区域通用 --- */
-        .game-panel {
-            background: #f0f7ff; border-radius: 25px;
-            padding: 25px; margin-top: 20px; border: 3px dashed var(--secondary);
-        }
-        .feedback-text { height: 30px; font-weight: bold; font-size: 1.2em; margin: 15px 0; }
+        /* 选词游戏 */
+        .quiz-img { font-size: 100px; margin: 20px 0; }
+        .opt-btn { width: 80%; padding: 15px; margin: 10px; border-radius: 15px; border: 2px solid var(--secondary); background: white; font-size: 1.2em; cursor: pointer; }
+        .correct { background: #d4edda !important; border-color: #28a745 !important; }
 
-        /* --- 游戏1：选择题 --- */
-        .quiz-image-box { font-size: 120px; margin-bottom: 20px; animation: float 4s ease-in-out infinite;}
-        .quiz-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .quiz-btn {
-            background: white; border: 2px solid #ddd; padding: 15px;
-            font-size: 1.2em; border-radius: 15px; cursor: pointer;
+        /* 写字游戏 */
+        .writing-box {
+            background: #2c3e50; width: 280px; height: 280px;
+            border: 8px solid #8d6e63; border-radius: 10px;
+            position: relative; cursor: crosshair; touch-action: none;
         }
-        .quiz-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; }
-        .quiz-btn.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .char-guide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 200px; color: rgba(255,255,255,0.15); pointer-events: none;
+            user-select: none;
+        }
+        canvas { position: absolute; top: 0; left: 0; }
 
-        /* --- 游戏2：组句 --- */
-        .sentence-container {
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
-            min-height: 70px; padding: 10px; background: rgba(255,255,255,0.7);
-            border-radius: 15px; border: 2px solid #e1e1e1; margin-bottom: 20px;
-        }
-        .word-tile {
-            background: white; border: 2px solid var(--accent); padding: 8px 15px;
-            border-radius: 12px; font-size: 1.1em; font-weight: bold; cursor: move;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.1); transition: transform 0.2s;
-        }
-        .word-tile:active { transform: scale(1.1); background: var(--accent); color: white;}
+        .btn-clear { background: #95a5a6; color: white; border: none; padding: 8px 20px; border-radius: 5px; margin-top: 10px; }
 
     </style>
 </head>
 <body>
 
-    <div id="screen-intro" class="screen-container active">
-        <div class="teacher-avatar">👩‍🏫</div>
-        <div class="bubble">
-            “嗨，梓辰！我是你的华语小老师。<br>快来加入我们的开学探险吧！准备好了吗？”
-        </div>
-        <button class="btn" onclick="goToScreen('screen-learn')">我准备好了！出发！🚀</button>
+<div id="app">
+    <div id="scr-start" class="screen active" style="justify-content: center;">
+        <div class="teacher">👩‍🏫</div>
+        <button class="btn-next" onclick="startAdventure()">点击进入梓辰的教室 🏫</button>
     </div>
 
-    <div id="screen-learn" class="screen-container">
-        <h2>📖 点一点，听声音</h2>
-        <p style="color:#666">点卡片听老师怎么读，要跟着念哦！</p>
-        <div id="learn-grid" class="grid-layout">
-            </div>
-        <div class="bubble" style="margin-top: 20px; padding: 10px;">
-            学完上面的词语，就来挑战游戏吧！👇
-        </div>
-        <button class="btn" onclick="startGame1()">开始玩游戏！🎮</button>
+    <div id="scr-intro" class="screen">
+        <div class="teacher">👩‍🏫</div>
+        <div class="bubble" id="intro-msg"></div>
+        <button class="btn-next" onclick="goLearn()">好，开始学习！</button>
     </div>
 
-    <div id="screen-game1" class="screen-container">
-        <h2>🎮 挑战一：看图选一选</h2>
-        <div class="game-panel">
-            <div id="quiz-target-icon" class="quiz-image-box">❓</div>
-            <div class="feedback-text" id="quiz1-feedback"></div>
-            <div id="quiz-options-area" class="quiz-options-grid">
-                </div>
+    <div id="scr-learn" class="screen">
+        <h3 class="game-title">📚 跟着老师读 (P1-P5)</h3>
+        <div class="scroll-area">
+            <div class="card-grid" id="learn-container"></div>
+        </div>
+        <button class="btn-next" onclick="startQuiz()">去玩游戏 🎮</button>
+    </div>
+
+    <div id="scr-q1" class="screen">
+        <h3 class="game-title">🎮 挑战一：看图选词</h3>
+        <div id="q1-icon" class="quiz-img"></div>
+        <div id="q1-opts" style="width: 100%;"></div>
+    </div>
+
+    <div id="scr-q2" class="screen">
+        <h3 class="game-title">🎮 挑战二：排一排句子</h3>
+        <div id="q2-target" style="min-height: 80px; width: 90%; border: 2px dashed #ccc; margin: 10px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 5px; padding: 10px; border-radius: 10px;"></div>
+        <div id="q2-pool" style="display: flex; gap: 10px; margin-top: 20px;"></div>
+        <button class="btn-next" onclick="checkQ2()">检查答案</button>
+    </div>
+
+    <div id="scr-q3" class="screen">
+        <h3 class="game-title">✍️ 挑战三：写生字</h3>
+        <p>梓辰，请跟着影子写出这个字：</p>
+        <div class="writing-box" id="paint-box">
+            <div class="char-guide" id="guide-char">老</div>
+            <canvas id="canvas" width="280" height="280"></canvas>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-clear" onclick="clearCanvas()">擦掉重写</button>
+            <button class="btn-next" id="btn-next-char" onclick="nextChar()" style="margin-top:10px">写好了</button>
         </div>
     </div>
 
-    <div id="screen-game2" class="screen-container">
-        <h2>🎮 挑战二：句子排排队</h2>
-        <p>点一点词语，把它们排成正确的句子：</p>
-        <div class="game-panel">
-            <div id="sentence-target" class="sentence-container" style="border-color: var(--accent);"></div>
-            <div id="sentence-pool" class="sentence-container" style="background: transparent; border: none;"></div>
-            
-            <div class="feedback-text" id="quiz2-feedback"></div>
-            <button class="btn" onclick="checkSentence()" style="font-size: 1em; padding: 10px 25px;">我排好了，检查！✅</button>
-        </div>
+    <div id="scr-outro" class="screen">
+        <div class="teacher">👋</div>
+        <div class="bubble" id="outro-msg"></div>
+        <button class="btn-next" onclick="location.reload()">重新学习</button>
     </div>
+</div>
 
-    <div id="screen-outro" class="screen-container">
-        <div class="teacher-avatar">🎉</div>
-        <h2>梓辰真棒！挑战成功！</h2>
-        <div class="bubble">
-            “你太厉害了！今天学了好多新知识。<br>我们下次再见喽，拜拜！👋”
-        </div>
-        <button class="btn" onclick="location.reload()" style="background: var(--secondary)">再玩一次 🔄</button>
-    </div>
+<script>
+    // --- 数据：完全根据PDF P1-P5 ---
+    const data = {
+        intro: "嗨，梓辰，我是你的小老师，让我们一起来学华语吧，好吗？",
+        outro: "梓辰真棒！我们任务都完成啦，下次见哟，拜拜！",
+        p1: [
+            { t: 'w', zh: '老师', py: 'lǎo shī', icon: '👩‍🏫' },
+            { t: 'w', zh: '同学', py: 'tóng xué', icon: '👦' },
+            { t: 'w', zh: '幼儿园', py: 'yòu ér yuán', icon: '🏫' },
+            { t: 's', zh: '这是我的幼儿园。', py: '', icon: '🏫' }
+        ],
+        others: [
+            { t: 'w', zh: '课室', py: 'kè shì', icon: '🖍️' },
+            { t: 'w', zh: '电脑室', py: 'diàn nǎo shì', icon: '💻' },
+            { t: 's', zh: '幼儿园里有课室。', py: '', icon: '🏠' },
+            { t: 'w', zh: '游乐场', py: 'yóu lè chǎng', icon: '🎡' },
+            { t: 's', zh: '游乐场旁边有厕所。', py: '', icon: '🚻' },
+            { t: 'w', zh: '园长', py: 'yuán zhǎng', icon: '👩‍💼' },
+            { t: 's', zh: '校车司机接送我们上下学。', py: '', icon: '🚌' }
+        ]
+    };
 
-    <script>
-        // --- 核心数据 (基于 PDF 内容 P1-P5) ---
-        // 使用 Emoji 作为视觉基础，CSS 会让它们看起来更像图标
-        const lessonData = [
-            // P1
-            { id: 'p1_t1', type: 'word', text: '老师', pinyin: 'lǎo shī', icon: '👩‍🏫' },
-            { id: 'p1_t2', type: 'word', text: '同学', pinyin: 'tóng xué', icon: '🎒' },
-            { id: 'p1_t3', type: 'word', text: '幼儿园', pinyin: 'yòu ér yuán', icon: '🏫' },
-            { id: 'p1_s1', type: 'sentence', text: '这是我的幼儿园。', pinyin: 'zhè shì wǒ de yòu ér yuán', icon: '🖼️' },
-            // P2
-            { id: 'p2_t1', type: 'word', text: '课室', pinyin: 'kè shì', icon: '🖍️' },
-            { id: 'p2_t2', type: 'word', text: '电脑室', pinyin: 'diàn nǎo shì', icon: '💻' },
-            { id: 'p2_s1', type: 'sentence', text: '幼儿园里有课室。', pinyin: 'yòu ér yuán lǐ yǒu kè shì', icon: '🏠' },
-            // P3
-            { id: 'p3_t1', type: 'word', text: '游乐场', pinyin: 'yóu lè chǎng', icon: '🎡' },
-            { id: 'p3_t2', type: 'word', text: '礼堂', pinyin: 'lǐ táng', icon: '🎤' },
-            { id: 'p3_s1', type: 'sentence', text: '游乐场旁边有厕所。', pinyin: 'yóu lè chǎng páng biān yǒu cè suǒ', icon: '🚻' },
-            // P4
-            { id: 'p4_t1', type: 'word', text: '园长', pinyin: 'yuán zhǎng', icon: '👨‍💼' },
-            { id: 'p4_s1', type: 'sentence', text: '课室里有同学。', pinyin: 'kè shì lǐ yǒu tóng xué', icon: '👨‍👩‍👧‍👦' },
-            // P5
-            { id: 'p5_t1', type: 'word', text: '校车司机', pinyin: 'xiào chē sī jī', icon: '🚌' },
-            { id: 'p5_s1', type: 'sentence', text: '校车司机接送我们。', pinyin: 'xiào chē sī jī jiē sòng wǒ men', icon: '👋' }
-        ];
+    const speech = window.speechSynthesis;
+    let canvas, ctx, painting = false;
 
-        // 游戏配置
-        let quiz1State = { currentIdx: 0, questions: [] };
-        let quiz2State = { currentIdx: 0, questions: [] };
+    // --- 核心语音函数 ---
+    function say(text, rate = 0.8, callback) {
+        speech.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'zh-CN';
+        msg.rate = rate; // 速度
+        if (callback) msg.onend = callback;
+        speech.speak(msg);
+    }
 
-        // --- 工具函数 ---
+    function show(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // --- 流程 ---
+    function startAdventure() {
+        show('scr-intro');
+        document.getElementById('intro-msg').innerText = data.intro;
+        say(data.intro, 0.8);
+    }
+
+    function goLearn() {
+        show('scr-learn');
+        const container = document.getElementById('learn-container');
+        container.innerHTML = '';
+        const allItems = [...data.p1, ...data.others];
         
-        // 语音播报
-        function speak(text, callback) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'zh-CN'; // 强制中文
-            utterance.rate = 0.85; // 语速适中
-            if (callback) utterance.onend = callback;
-            window.speechSynthesis.speak(utterance);
-        }
+        allItems.forEach(item => {
+            const div = document.createElement('div');
+            div.className = `card ${item.t === 's' ? 'sentence' : ''}`;
+            div.innerHTML = `<div class="card-icon">${item.icon}</div>
+                             <div class="card-zh">${item.zh}</div>
+                             <div class="card-py">${item.py}</div>`;
+            div.onclick = () => say(item.zh, 0.7); // 学习部分语速0.7
+            container.appendChild(div);
+        });
+        say("点一点卡片，听听老师怎么读，要跟着念哦！", 0.8);
+    }
 
-        // 切换屏幕
-        function goToScreen(screenId) {
-            document.querySelectorAll('.screen-container').forEach(el => el.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            
-            // 根据屏幕自动触发语音
-            if (screenId === 'screen-intro') speak("嗨梓辰，我是你的华语小老师");
-            if (screenId === 'screen-learn') speak("点一点卡片，听听老师怎么读");
-            if (screenId === 'screen-outro') speak("梓辰真棒，挑战成功啦！");
-        }
+    // --- 游戏 1 (选词) ---
+    function startQuiz() {
+        show('scr-q1');
+        loadQ1();
+    }
+    function loadQ1() {
+        const item = data.p1[0]; // 老师
+        document.getElementById('q1-icon').innerText = item.icon;
+        const opts = document.getElementById('q1-opts');
+        opts.innerHTML = '';
+        ['同学', '老师'].forEach(txt => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = txt;
+            b.onclick = () => {
+                if (txt === '老师') {
+                    b.classList.add('correct'); say("答对了！");
+                    setTimeout(startQ2, 1000);
+                } else { say("不对哦，再选选？"); }
+            };
+            opts.appendChild(b);
+        });
+    }
 
-        // --- 核心逻辑 ---
+    // --- 游戏 2 (排句) ---
+    function startQ2() {
+        show('scr-q2');
+        const target = document.getElementById('q2-target');
+        const pool = document.getElementById('q2-pool');
+        const parts = ['这是', '我的', '幼儿园'];
+        parts.sort(() => Math.random() - 0.5).forEach(p => {
+            const div = document.createElement('div');
+            div.style = "padding:10px 15px; background:white; border:2px solid var(--primary); border-radius:10px; cursor:pointer; font-weight:bold;";
+            div.innerText = p;
+            div.onclick = () => {
+                if (div.parentElement === pool) target.appendChild(div);
+                else pool.appendChild(div);
+                say(p);
+            };
+            pool.appendChild(div);
+        });
+    }
+    function checkQ2() {
+        const res = Array.from(document.getElementById('q2-target').children).map(e => e.innerText).join('');
+        if (res === '这是我的幼儿园') { say("太棒了！梓辰真聪明。"); setTimeout(startQ3, 1000); }
+        else say("顺序不太对，重新排排看？");
+    }
 
-        // 1. 初始化学习卡片
-        function initLearnScreen() {
-            const container = document.getElementById('learn-grid');
-            lessonData.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'learn-card';
-                // 判断是词语还是句子，调整显示方式
-                const iconDisplay = item.type === 'word' ? item.icon : '🔊';
-                card.innerHTML = `
-                    <span class="card-icon">${iconDisplay}</span>
-                    <div class="card-text" style="${item.type==='sentence'?'font-size:1em':''}">${item.text}</div>
-                    <div class="card-pinyin" style="${item.type==='sentence'?'display:none':''}">${item.pinyin}</div>
-                `;
-                card.onclick = () => {
-                    card.classList.add('playing');
-                    speak(item.text, () => card.classList.remove('playing'));
-                };
-                container.appendChild(card);
-            });
-        }
+    // --- 游戏 3 (写字) ---
+    function startQ3() {
+        show('scr-q3');
+        initCanvas();
+        say("梓辰，跟着影子写写“老师”这两个字吧。先写“老”。");
+    }
 
-        // 2. 初始化游戏一（选择题）
-        function startGame1() {
-            // 筛选出所有的“词语”用于出题
-            const words = lessonData.filter(item => item.type === 'word');
-            // 随机挑选3个作为题目
-            quiz1State.questions = words.sort(() => 0.5 - Math.random()).slice(0, 3);
-            quiz1State.currentIdx = 0;
-            speak("挑战一开始啦，看图片，选出正确的词语");
-            goToScreen('screen-game1');
-            loadQuiz1Question();
-        }
+    function initCanvas() {
+        canvas = document.getElementById('canvas');
+        ctx = canvas.getContext('2d');
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 12;
+        ctx.lineCap = "round";
 
-        function loadQuiz1Question() {
-            if (quiz1State.currentIdx >= quiz1State.questions.length) {
-                setTimeout(startGame2, 1500); // 进入下一个游戏
-                return;
-            }
-            const q = quiz1State.questions[quiz1State.currentIdx];
-            document.getElementById('quiz-target-icon').innerText = q.icon;
-            document.getElementById('quiz1-feedback').innerText = ''; document.getElementById('quiz1-feedback').style.color = '#333';
-            
-            const optionsArea = document.getElementById('quiz-options-area');
-            optionsArea.innerHTML = '';
-
-            // 生成一个错误选项
-            const allOtherWords = lessonData.filter(i => i.type === 'word' && i.text !== q.text);
-            const wrongOptionStr = allOtherWords[Math.floor(Math.random() * allOtherWords.length)].text;
-            
-            let options = [q.text, wrongOptionStr];
-            options.sort(() => 0.5 - Math.random()); // 打乱顺序
-
-            options.forEach(optText => {
-                const btn = document.createElement('button');
-                btn.className = 'quiz-btn';
-                btn.innerText = optText;
-                btn.onclick = () => checkQuiz1(btn, optText, q.text);
-                optionsArea.appendChild(btn);
-            });
-        }
-
-        function checkQuiz1(btn, selected, correct) {
-            if (selected === correct) {
-                btn.classList.add('correct');
-                document.getElementById('quiz1-feedback').innerText = '🎉 答对啦！梓辰真棒！';
-                document.getElementById('quiz1-feedback').style.color = 'green';
-                speak('答对啦', () => {
-                   quiz1State.currentIdx++;
-                   setTimeout(loadQuiz1Question, 1000);
-                });
-            } else {
-                btn.classList.add('wrong');
-                document.getElementById('quiz1-feedback').innerText = '🤔 不对哦，再想想。';
-                document.getElementById('quiz1-feedback').style.color = 'red';
-                speak('不对哦');
-            }
-        }
-
-        // 3. 初始化游戏二（组句）
-        function startGame2() {
-             // 手动定义要考察的句子和分词结构
-             quiz2State.questions = [
-                { full: '这是我的幼儿园。', parts: ['这是', '我的', '幼儿园。'] },
-                { full: '幼儿园里有课室。', parts: ['幼儿园', '里有', '课室。'] },
-                { full: '校车司机接送我们。', parts: ['校车司机', '接送', '我们。'] }
-            ];
-            quiz2State.currentIdx = 0;
-            speak("挑战二，把打乱的词语排成通顺的句子");
-            goToScreen('screen-game2');
-            loadQuiz2Question();
-        }
-
-        function loadQuiz2Question() {
-            if (quiz2State.currentIdx >= quiz2State.questions.length) {
-                setTimeout(() => goToScreen('screen-outro'), 1500); // 全部通关
-                return;
-            }
-            const q = quiz2State.questions[quiz2State.currentIdx];
-            document.getElementById('quiz2-feedback').innerText = ''; document.getElementById('quiz2-feedback').style.color = '#333';
-            const pool = document.getElementById('sentence-pool');
-            const target = document.getElementById('sentence-target');
-            pool.innerHTML = ''; target.innerHTML = '';
-
-            // 打乱词块并生成可点击的方块
-            [...q.parts].sort(() => 0.5 - Math.random()).forEach(word => {
-                const tile = document.createElement('div');
-                tile.className = 'word-tile';
-                tile.innerText = word;
-                // 点击在两个区域间移动
-                tile.onclick = function() {
-                    if (this.parentElement === pool) target.appendChild(this);
-                    else pool.appendChild(this);
-                    speak(this.innerText); // 点击时读出声音辅助记忆
-                };
-                pool.appendChild(tile);
-            });
-        }
-
-        function checkSentence() {
-            const q = quiz2State.questions[quiz2State.currentIdx];
-            // 获取用户排列的文本
-            const userSentence = Array.from(document.getElementById('sentence-target').children)
-                .map(el => el.innerText).join('');
-            
-            if (userSentence === q.full) {
-                document.getElementById('quiz2-feedback').innerText = '🌟 排对啦！完美！';
-                document.getElementById('quiz2-feedback').style.color = 'green';
-                 speak('排对啦！完美！', () => {
-                   quiz2State.currentIdx++;
-                   setTimeout(loadQuiz2Question, 1500);
-                });
-            } else {
-                document.getElementById('quiz2-feedback').innerText = '💬 顺序好像不太通顺哦，再试试？';
-                document.getElementById('quiz2-feedback').style.color = 'red';
-                speak('顺序好像不太通顺哦');
-            }
-        }
-
-        // --- 入口 ---
-        window.onload = function() {
-            initLearnScreen();
-            goToScreen('screen-intro'); // 启动开场
+        const startDraw = (e) => { painting = true; draw(e); };
+        const endDraw = () => { painting = false; ctx.beginPath(); };
+        const draw = (e) => {
+            if (!painting) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            ctx.lineTo(x, y);
+            ctx.stroke();
         };
 
-    </script>
+        canvas.onmousedown = startDraw; canvas.onmouseup = endDraw; canvas.onmousemove = draw;
+        canvas.ontouchstart = startDraw; canvas.ontouchend = endDraw; canvas.ontouchmove = draw;
+    }
+
+    let currentChar = 0;
+    function nextChar() {
+        if (currentChar === 0) {
+            currentChar = 1;
+            document.getElementById('guide-char').innerText = "师";
+            clearCanvas();
+            say("写得真好！接下来写“师”。");
+        } else {
+            finish();
+        }
+    }
+
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    // --- 结尾 ---
+    function finish() {
+        show('scr-outro');
+        document.getElementById('outro-msg').innerText = data.outro;
+        say(data.outro, 0.8);
+    }
+</script>
 </body>
 </html>
