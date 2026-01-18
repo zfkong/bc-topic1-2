@@ -5,95 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>梓辰的华语探险</title>
     <style>
-        :root { --primary: #FF9A9E; --secondary: #a1c4fd; --bg: #fdfcfb; }
+        :root { --primary: #FF6B6B; --secondary: #4D96FF; --bg: #F0F2F5; }
         body { font-family: 'PingFang SC', sans-serif; background: var(--bg); margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; touch-action: manipulation; }
         
         #app { width: 100%; max-width: 600px; height: 100vh; background: white; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         
-        /* 导航栏优化：增加后退和前进 */
-        .top-nav { padding: 10px; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 2px solid #f0f0f0; }
-        .nav-group { display: flex; gap: 5px; }
-        .nav-btn { border: none; background: #f0f0f0; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 0.8em; font-weight: bold; }
-        .jump-btn { background: #e3f2fd; color: #1976d2; }
+        /* 导航栏：大按钮设计 */
+        .top-nav { padding: 15px; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 3px solid #eee; }
+        .nav-btn { border: none; background: #f0f0f0; padding: 10px 15px; border-radius: 12px; cursor: pointer; font-size: 1em; font-weight: bold; box-shadow: 0 4px #ccc; active { transform: translateY(2px); box-shadow: 0 2px #ccc; } }
+        .prev-btn { background: #FF9A9E; color: white; box-shadow: 0 4px #e57373; }
+        .next-btn { background: #6BCB77; color: white; box-shadow: 0 4px #4eb05a; }
 
-        .screen { display: none; padding: 15px; flex-direction: column; align-items: center; flex: 1; overflow-y: auto; text-align: center; }
+        .screen { display: none; padding: 20px; flex-direction: column; align-items: center; flex: 1; overflow-y: auto; text-align: center; }
         .active { display: flex; }
         
-        .teacher-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; }
+        /* 词语卡片：立体按钮视觉 */
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .card { background: white; border: 3px solid #eee; border-radius: 20px; padding: 15px; cursor: pointer; box-shadow: 0 6px #ddd; transition: 0.1s; }
+        .card:active { transform: translateY(3px); box-shadow: 0 3px #ddd; }
+        .card-full { grid-column: span 2; text-align: left; background: #FFF9F0; border-color: #FFD93D; font-size: 1.4em; padding: 20px; }
         
-        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-        .card { background: white; border: 2px solid #eee; border-radius: 15px; padding: 10px; cursor: pointer; }
-        .card-full { grid-column: span 2; text-align: left; background: #fff9f9; border-left: 5px solid var(--primary); font-size: 1.2em; padding: 15px; }
-        
-        .office-tag { background: #5dade2; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block; margin-bottom: 5px; }
+        /* 拼句子块：大字大按钮 */
+        .word-tile { padding: 15px 25px; background: white; border: 3px solid var(--secondary); border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 1.3em; box-shadow: 0 5px var(--secondary); margin: 5px; }
+        .word-tile:active { transform: translateY(3px); box-shadow: 0 2px var(--secondary); }
 
-        /* 写字板优化：放大且笔触变细 */
-        .board-container { width: 95%; margin: 10px auto; position: relative; }
-        .board { background: #333; width: 100%; aspect-ratio: 1 / 1; border: 6px solid #8d6e63; border-radius: 10px; position: relative; touch-action: none; }
-        .guide-txt { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 70px; color: rgba(255,255,255,0.18); pointer-events: none; letter-spacing: 2px; padding: 10px; box-sizing: border-box; font-weight: bold; }
+        /* 全屏黑板与巨大字 */
+        .board-container { width: 100%; margin: 10px 0; }
+        .board { background: #222; width: 100%; aspect-ratio: 1 / 1; border: 8px solid #8d6e63; border-radius: 15px; position: relative; touch-action: none; overflow: hidden; }
+        .guide-txt { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; 
+                     color: rgba(255,255,255,0.2); pointer-events: none; font-weight: bold; white-space: nowrap; }
         canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
-        .btn-main { background: var(--primary); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.2em; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-action { background: var(--secondary); color: white; border: none; padding: 18px 50px; border-radius: 50px; font-size: 1.4em; cursor: pointer; margin-top: 20px; box-shadow: 0 6px #357ae8; font-weight: bold; }
+        .btn-action:active { transform: translateY(3px); box-shadow: 0 3px #357ae8; }
+        
+        h3 { font-size: 1.6em; color: #333; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
 <div id="app">
     <div class="top-nav" id="top-nav" style="display:none">
-        <button class="nav-btn" onclick="goPrevPage()">⏮️ 上一页</button>
-        <div class="nav-group">
-            <span id="page-info" style="font-weight:bold; line-height:35px; margin: 0 5px;">P1</span>
-            <button class="nav-btn jump-btn" onclick="goNextPage()">下一页 ⏭️</button>
-        </div>
-        <button class="nav-btn" onclick="goHome()">🏠</button>
+        <button class="nav-btn prev-btn" onclick="goPrevPage()">⬅️ 返回</button>
+        <span id="page-info" style="font-size: 1.2em; font-weight:900;">P1</span>
+        <button class="nav-btn next-btn" onclick="goNextPage()">跳过 ➡️</button>
     </div>
 
     <div id="scr-start" class="screen active" style="justify-content: center;">
-        <img src="teacher.png" class="teacher-img" alt="老师">
-        <h2>梓辰的华语探险</h2>
-        <button class="btn-main" onclick="startApp()">点击开始 🎈</button>
+        <img src="teacher.png" style="width:120px; height:120px; border-radius:50%; border:5px solid var(--primary);">
+        <h1>梓辰的华语探险</h1>
+        <button class="btn-action" onclick="startApp()">点击开始 🎈</button>
     </div>
 
     <div id="scr-learn" class="screen">
-        <h3>📚 听一听</h3>
+        <h3>📚 点一点听声音</h3>
         <div class="card-grid" id="learn-items"></div>
-        <button class="btn-main" onclick="nextStep()">拼句子 🧩</button>
+        <button class="btn-action" onclick="nextStep()">去拼句子 🧩</button>
     </div>
 
     <div id="scr-quiz-sentence" class="screen">
         <h3>🧩 句子排排队</h3>
-        <div style="background:#fafafa; border:2px dashed #ddd; border-radius:15px; padding:10px; width:100%; box-sizing:border-box;">
-            <div id="target-zone" style="min-height:60px; border-bottom:2px solid #eee; display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:15px;"></div>
-            <div id="pool-zone" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
+        <div style="background:#f8f9fa; border:3px dashed #ccc; border-radius:20px; padding:15px; width:100%; box-sizing:border-box;">
+            <div id="target-zone" style="min-height:80px; border-bottom:3px solid #eee; display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:20px; padding:10px;"></div>
+            <div id="pool-zone" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;"></div>
         </div>
-        <button class="btn-main" onclick="checkSentence()">检查 ✅</button>
+        <button class="btn-action" onclick="checkSentence()" style="background:#6BCB77; box-shadow:0 6px #4eb05a;">检查答案 ✅</button>
     </div>
 
     <div id="scr-quiz-write" class="screen">
-        <h3>✍️ 小小书法家</h3>
-        <p id="write-title" style="font-weight:bold; color:var(--primary); margin:5px 0;"></p>
+        <h3 id="write-title">✍️ 写一写</h3>
         <div class="board-container">
             <div class="board">
                 <div class="guide-txt" id="canvas-guide"></div>
                 <canvas id="canvas"></canvas>
             </div>
         </div>
-        <div style="display:flex; gap:10px;">
-            <button onclick="clearCanvas()" style="padding:10px 25px; border-radius:30px; border:1px solid #ccc; background:white;">重写</button>
-            <button class="btn-main" style="margin:0" onclick="confirmWrite()">写好了</button>
+        <div style="display:flex; gap:15px; width:100%; justify-content:center;">
+            <button onclick="clearCanvas()" style="padding:15px 30px; border-radius:20px; border:2px solid #ccc; background:white; font-weight:bold;">重写</button>
+            <button class="btn-action" style="margin:0" onclick="confirmWrite()">写好了 ⭐</button>
         </div>
     </div>
 
     <div id="scr-page-done" class="screen" style="justify-content: center;">
-        <div style="font-size:60px">🌟</div>
-        <h2>太棒了！</h2>
-        <button class="btn-main" onclick="goNextPage()">下一页 🚀</button>
+        <div style="font-size:100px">🎉</div>
+        <h2>梓辰真棒！</h2>
+        <button class="btn-action" onclick="goNextPage()">进入下一关 🚀</button>
     </div>
 
     <div id="scr-final" class="screen" style="justify-content: center;">
-        <img src="teacher.png" class="teacher-img">
-        <h2>全部挑战成功！</h2>
-        <button class="btn-main" onclick="goHome()">回主页</button>
+        <h1>全部通关啦！</h1>
+        <button class="btn-action" onclick="goHome()">回主页</button>
     </div>
 </div>
 
@@ -116,7 +117,7 @@
           quiz: { full: "课室里有同学", parts: ["课室里", "有", "同学"] }, 
           write: ["园长", "同学"] },
         { p: "P5", words: [{z:'校车司机', i:'🚌'}, {z:'园工', i:'👨‍🌾'}], 
-          sentences: ["幼儿园里有校车。", "校车司机接送我们上下学。", "幼儿园里有校工。"], 
+          sentences: ["幼儿园里有校车。", "校车司机接送我们上下学。", "幼儿园里有园工。"], 
           quiz: { full: "幼儿园里有校车", parts: ["幼儿园里", "有", "校车"] }, 
           write: ["校车", "园工"] }
     ];
@@ -133,80 +134,59 @@
         document.getElementById('page-info').innerText = data.p;
         if(step === 0) {
             show('scr-learn'); const items = document.getElementById('learn-items'); items.innerHTML = '';
-            data.words.forEach(w => { const d = document.createElement('div'); d.className = 'card'; d.innerHTML = w.off ? `<div class="office-tag">OFFICE</div>` : `<div style="font-size:35px">${w.i}</div>`; d.innerHTML += `<br><b>${w.z}</b>`; d.onclick = () => say(w.z); items.appendChild(d); });
+            data.words.forEach(w => { const d = document.createElement('div'); d.className = 'card'; d.innerHTML = w.off ? `<div style="background:#5dade2;color:white;padding:5px;border-radius:5px;font-size:14px;margin-bottom:5px">OFFICE</div>` : `<div style="font-size:45px">${w.i}</div>`; d.innerHTML += `<br><b>${w.z}</b>`; d.onclick = () => say(w.z); items.appendChild(d); });
             data.sentences.forEach(s => { const d = document.createElement('div'); d.className = 'card card-full'; d.innerHTML = `🔊 ${s}`; d.onclick = () => say(s); items.appendChild(d); });
         } else if(step === 1) {
             show('scr-quiz-sentence'); const target = document.getElementById('target-zone'); const pool = document.getElementById('pool-zone'); target.innerHTML = ''; pool.innerHTML = '';
             [...data.quiz.parts].sort(()=>Math.random()-0.5).forEach(p => { const d = document.createElement('div'); d.className = 'word-tile'; d.innerText = p; d.onclick = () => { if(d.parentElement===pool) target.appendChild(d); else pool.appendChild(d); say(p); }; pool.appendChild(d); });
         } else if(step === 2) {
-            show('scr-quiz-write'); writeWordIdx = 0; resizeCanvas(); loadWriteWord();
+            show('scr-quiz-write'); writeWordIdx = 0; setTimeout(resizeCanvas, 50); loadWriteWord();
         }
     }
 
     function loadWriteWord() {
         const word = pageData[currentIdx].write[writeWordIdx];
-        document.getElementById('write-title').innerText = `正在写：${word}`;
-        document.getElementById('canvas-guide').innerText = word;
-        document.getElementById('canvas-guide').style.fontSize = word.length > 2 ? '45px' : '70px';
+        document.getElementById('write-title').innerText = `请写一写：${word}`;
+        const guide = document.getElementById('canvas-guide');
+        guide.innerText = word;
+        // 动态计算字体大小，保证字变大且不出界
+        const fontSize = Math.min(280 / word.length, 120); 
+        guide.style.fontSize = fontSize + "px";
         clearCanvas();
         say(word);
     }
 
     function confirmWrite() {
         writeWordIdx++;
-        if(writeWordIdx < pageData[currentIdx].write.length) {
-            loadWriteWord();
-        } else {
-            show('scr-page-done'); 
-            say("非常棒");
-        }
+        if(writeWordIdx < pageData[currentIdx].write.length) loadWriteWord();
+        else { show('scr-page-done'); say("太棒了"); }
     }
 
     function nextStep() { step++; loadStep(); }
     function checkSentence() { if(Array.from(document.getElementById('target-zone').children).map(e=>e.innerText).join('') === pageData[currentIdx].quiz.full) { say("正确"); setTimeout(nextStep, 600); } else say("再试一次"); }
     
-    // 导航控制
-    function goNextPage() { 
-        if(currentIdx < pageData.length - 1) { currentIdx++; step = 0; loadStep(); } 
-        else show('scr-final'); 
-    }
-    function goPrevPage() { 
-        if(currentIdx > 0) { currentIdx--; step = 0; loadStep(); } 
-    }
-    
+    function goNextPage() { if(currentIdx < pageData.length - 1) { currentIdx++; step = 0; loadStep(); } else show('scr-final'); }
+    function goPrevPage() { if(currentIdx > 0) { currentIdx--; step = 0; loadStep(); } }
     function goHome() { show('scr-start'); }
 
-    // 写字逻辑优化：笔触变细
     let canvas, ctx, painting = false;
     function resizeCanvas() {
         canvas = document.getElementById('canvas');
         const box = canvas.parentElement.getBoundingClientRect();
-        canvas.width = box.width;
-        canvas.height = box.height;
+        canvas.width = box.width; canvas.height = box.height;
         ctx = canvas.getContext('2d');
-        ctx.strokeStyle = "white"; 
-        ctx.lineWidth = 4; // 笔触调细
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
+        ctx.strokeStyle = "white"; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.lineJoin = "round";
         initPaint();
     }
-
     function initPaint() {
         const getXY = (e) => { 
             const r = canvas.getBoundingClientRect(); 
-            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
-            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-            return [clientX - r.left, clientY - r.top]; 
+            const cx = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const cy = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            return [cx - r.left, cy - r.top]; 
         }
-        canvas.onmousedown = canvas.ontouchstart = (e) => { 
-            painting = true; ctx.beginPath(); 
-            const [x,y]=getXY(e); ctx.moveTo(x,y); 
-            if(e.type === 'touchstart') e.preventDefault();
-        };
-        canvas.onmousemove = canvas.ontouchmove = (e) => { 
-            if(painting) { const [x,y]=getXY(e); ctx.lineTo(x,y); ctx.stroke(); } 
-            if(e.type === 'touchmove') e.preventDefault();
-        };
+        canvas.onmousedown = canvas.ontouchstart = (e) => { painting = true; ctx.beginPath(); const [x,y]=getXY(e); ctx.moveTo(x,y); if(e.type === 'touchstart') e.preventDefault(); };
+        canvas.onmousemove = canvas.ontouchmove = (e) => { if(painting) { const [x,y]=getXY(e); ctx.lineTo(x,y); ctx.stroke(); } if(e.type === 'touchmove') e.preventDefault(); };
         canvas.onmouseup = canvas.ontouchend = () => { painting = false; };
     }
     function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); }
